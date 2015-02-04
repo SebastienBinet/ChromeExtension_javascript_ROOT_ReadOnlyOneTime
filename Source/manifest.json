@@ -1,0 +1,32 @@
+{
+  "manifest_version": 2,
+
+  "name": "ROOT",
+  "description": "ROOT",
+  "version": "1.0.12",
+
+
+  "background": {
+    "scripts": ["background.js", "content_script_save_all_in_page.js"],
+    "persistent": false
+  },
+
+
+  "browser_action": {
+    "default_icon": "icon.png",
+    "default_title": "ROOT_Test_012"
+  },
+  "icons": { "16": "icon.png",
+           "48": "icon.png",
+          "128": "icon.png" },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["recusiveStringFunctions.js", "content_script_shared.js", "findAndReplaceDOMText.js", "content_script_periodic.js", "content_script_UI.js"]
+    }
+  ],
+  "permissions": [
+//    "tabs", "activeTab", "http://*/*.hostname", "http://*/", "http://*/*", "https://*/*.hostname", "https://*/*" 
+   "tabs", "activeTab", "http://*/*.hostname", "http://*/", "http://*/*", "https://*/*.hostname", "https://*/*", "file:///*", "file:///*/*", "file:///*/*/*", "file:///*.hostname" 
+  ]
+}
