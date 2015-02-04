@@ -1,0 +1,75 @@
+<!doctype html>
+
+<head>
+<style>
+h1 {color:green;}
+div {color:orange;}
+span.ROOT {
+    color: red;
+}
+</style>
+</head>
+
+<body>
+<div>yyyy<span>zzz</span><span>ZZZ</span></div>  
+<div id="myDiv">This is <span style="background-color: rgb(211, 255, 230);">a di</span>v element.</div>
+<br>
+<button type="button" onclick="myFunction()">Set border</button>
+
+<script>
+function myFunction() {
+    document.getElementById("myDiv").style.border = "thick solid #0000FF";
+    document.getElementById("myDiv").style.backgroundColor = "red";
+    
+}
+</script>
+    
+<tr>===============================================================</tr><br>
+<div id="myDiv2000" style="background-color: rgb(211, 255, 230);">This is <span style="background-color: rgb(0, 255, 100);">a<span> di</span></span>v element.</div>
+<div id="myDiv2">This is <span style="background-color: rgb(211, 255, 230);">a di</span>v element.</div>
+<br>
+<button type="button2" onclick="myFunction2()">Set border2</button>
+
+<script>
+function myFunction2() {
+    document.getElementById("myDiv2000").style.backgroundColor = "rgb(64, 45, 170)";
+    document.getElementById("myDiv2").style.border = "thick solid #0000FF";
+    document.getElementById("myDiv2").style.backgroundColor = "red";
+     
+}
+</script>
+   
+    
+<h1>This is a heading</h1>
+0    test1 <span class="ROOT"> test2 <h1>tre</h1>uuu</span>test3<br><br>
+1    Test of all functions <br>
+2    test<em>test</em>test  <br>
+3    test<span>test</span>test  <br>
+4    tete<em style="background-color: rgb(211, 255, 230);">trtr</em>tttt <br>
+5    tte<span style="background-color: rgb(211, 255, 230);">trtr</span>tttt
+6    <div>
+7        tyty<em style="background-color: rgb(211, 255, 230);">tutu</em>titi
+8    </div>
+9    abab<span style="background-color: rgb(211, 255, 230);">aca<div>wwwww</div>cadad</span>aeae<br>
+10    <div>abab<span style="background-color: rgb(211, 255, 230);">aca<div>wwwww</div>cadad</span>aeae</div><br>
+11    abcdefg<span>hijkl</span>mnopq  <br>
+12		<div class="boxDemo">
+13			<h1>Learn Web Building</h1>
+14			<p>Learn how to create a website on your own computer<br>
+15			Learn the basics of web building in less than a day<br>
+16			Learn how to add a database to your website</p>
+17			<a class="btn" href="website/default.asp" target="_top">Web Building Tutorial</a>
+18		</div>
+19
+    
+    <script src="recusiveStringFunctions.js"></script>
+    <script src="content_script_shared.js"></script>
+    <script src="findAndReplaceDOMText.js"></script>
+    <script src="content_script_periodic.js"></script>
+    <script src="content_script_UI.js"></script>
+    
+    <script>
+        putInGreyAllElementsInPageHavingThisString("abcde");
+    </script>
+
+</body>

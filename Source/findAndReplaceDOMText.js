@@ -1,13 +1,43 @@
 GREY_COLOR = 'rgb(211, 255, 230)';
 var debugLogRecursiveDOM = false;
 
-function putInGreyAllElementsInPageHavingThisString(stringToFind) {
+//function OBSOLETE_putInGreyAllElementsInPageHavingThisString(stringToFind) {
+//    
+//    var topElement = document.getElementsByTagName('body')[0];
+//    var regex = '';
+//    var option = {};
+//    
+//    regex = RegExp(stringToFind, 'gi');
+//    option = {
+//        find: regex,
+////        replace: function(portion, match) {
+////            var el = document.createElement('em');
+////            el.style.backgroundColor = GREY_COLOR;
+////            el.innerHTML = portion.text;
+////            return el;
+////        }
+//       replace: function(portion, match) {
+//            var sp = document.createElement('span');
+//            sp.style.backgroundColor = GREY_COLOR;
+//            sp.innerHTML = portion.text;
+//            return sp;
+//        }
+//    };
+//    findAndReplaceDOMText(topElement, option);
+//}
+function putInGreyThisStringInPage(stringAndPosToReplace) {
+    
+    
+    // find element with beginning position
+    
+    
+    
     
     var topElement = document.getElementsByTagName('body')[0];
     var regex = '';
     var option = {};
     
-    regex = RegExp(stringToFind, 'gi');
+    regex = RegExp(stringAndPosToReplace., 'gi');
     option = {
         find: regex,
 //        replace: function(portion, match) {
@@ -40,6 +70,55 @@ function getAggregateTextInPage() {
 }
 
 
+function findElementWithThisText(node, stringAndPosInPage) {
+
+    var parseInfo = {
+        nbCharParsed: 0,   // this is the number of char analysed during this call
+        element   : null // at the end of the recursive calls this will contain the elemnt index.
+    };
+
+    if (node.nodeType === 3) {
+        var temp_chars = node.data;
+        parseInfo.nbCharParsed = temp_chars.length;
+        textAndInfoLocal.textChars = node.data;
+        return textAndInfoLocal;
+    }
+
+    if (elementFilter && !elementFilter(node)) {
+        textAndInfoLocal.textChars = '';
+        return textAndInfoLocal;
+    }
+
+    var txt = '';
+
+// TODO: verify if code need to handle the case where script is not the last sibling !!!!!!!!!!!! should we exit the loop ?
+    if (node = node.firstChild) do {
+        // there was a child
+        var textAndInfoInnerLoop = getText(node, elementFilter);
+        txt += textAndInfoInnerLoop.textChars;
+        //      isAlreadyRooted += textAndInfoInnerLoop.textAlreadyRootColored;
+    } while ((node = node.nextSibling) && (node.nodeName !== "SCRIPT")); // loop until there is no sibling. 
+
+    textAndInfoLocal.textChars = txt;
+    return textAndInfoLocal;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /**
  * Gets aggregate text of a node without resorting
  * to broken innerText/textContent
@@ -55,7 +134,7 @@ function getText(node, elementFilter) {
     if (node && node.outerHTML) {
         // verify if there is a background-color information
         var currentOuterHtml = node.outerHTML;
-        currentBackgroundIndex = currentOuterHtml.indexOf("<em style=\"background-color: rgb(211, 255, 230);\">");
+        var currentBackgroundIndex = currentOuterHtml.indexOf("<em style=\"background-color: rgb(211, 255, 230);\">");
         if (currentBackgroundIndex === 0) {
 							                                                             if (debugLogRecursiveDOM) { console.log("startsAlreadyByRootColor"); }
 //                        textAndInfoLocal.textAlreadyRootColored = '1';
@@ -74,12 +153,13 @@ function getText(node, elementFilter) {
 
     var txt = '';
 
-
+// TODO: verify if code need to handle the case where script is not the last sibling !!!!!!!!!!!! should we exit the loop ?
     if (node = node.firstChild) do {
+        // there was a child
         var textAndInfoInnerLoop = getText(node, elementFilter);
         txt += textAndInfoInnerLoop.textChars;
         //      isAlreadyRooted += textAndInfoInnerLoop.textAlreadyRootColored;
-    } while ((node = node.nextSibling) && (node.nodeName !== "SCRIPT"));
+    } while ((node = node.nextSibling) && (node.nodeName !== "SCRIPT")); // loop until there is no sibling. 
 
     textAndInfoLocal.textChars = txt;
     return textAndInfoLocal;
@@ -299,7 +379,7 @@ window.findAndReplaceDOMText = (function () {
 //                if (curNode && curNode.outerHTML){
 //                    // verify if there is a background-color information
 //                    var currentOuterHtml = curNode.outerHTML;
-//                    currentBackgroundIndex = currentOuterHtml.indexOf("<em style=\"background-color: rgb(211, 255, 230);\">");
+//                    var currentBackgroundIndex = currentOuterHtml.indexOf("<em style=\"background-color: rgb(211, 255, 230);\">");
 //                    if (currentBackgroundIndex == 0){
 //                        			                                                     if (debugLogRecursiveDOM) {console.log("Already greyed-out, no need to process more");}
 //                    } 
@@ -308,7 +388,7 @@ window.findAndReplaceDOMText = (function () {
                 if (curNode && curNode.parentNode && (currentOuterHtml = curNode.parentNode.outerHTML)){
                     // verify if there is a background-color information
                     // var currentOuterHtml = curNode.parentNode.outerHTML;
-                    currentBackgroundIndex = currentOuterHtml.indexOf("<em style=\"background-color: rgb(211, 255, 230);\">");
+                    var currentBackgroundIndex = currentOuterHtml.indexOf("<em style=\"background-color: rgb(211, 255, 230);\">");
                     if (currentBackgroundIndex == 0){
                         			                                                     if (debugLogRecursiveDOM) {console.log("Already greyed-out, no need to process more");}
                         alreadyGredyout = true;

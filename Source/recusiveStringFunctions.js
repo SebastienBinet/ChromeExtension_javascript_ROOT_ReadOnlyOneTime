@@ -333,11 +333,11 @@ function validateRecursiveLargest(a, b, c, d, expBeg, expEnd) {
     }
 }
 function validateRecursiveAll(storedText, allPageText, minMatchLength, expectedReturn) {
-    var ret = findAllMatches(storedText, allPageText, minMatchLength);
+    var retStringAndPosArray = findAllMatches(storedText, allPageText, minMatchLength);
     var stringToPrint = "<br> recursive All: \"" + storedText + "\", \"" + allPageText + "\", "  + minMatchLength + ", >>>";
-    for(index1=0; index1 < ret.length; index1++) {
-        stringToPrint += ret[index1];
-        if (index1 + 1 != ret.length) {
+    for(index1=0; index1 < retStringAndPosArray.length; index1++) {
+        stringToPrint = stringToPrint + "[" + retStringAndPosArray[index1].stringFound + " from " + retStringAndPosArray[index1].begPosInPage + " to " + retStringAndPosArray[index1].endPosInPage + "]";
+        if (index1 + 1 != retStringAndPosArray.length) {
             stringToPrint += ", ";
         }
     }
@@ -352,9 +352,9 @@ function validateRecursiveAll(storedText, allPageText, minMatchLength, expectedR
     
     // validate if return array is as expected
     var thereWasError = false;
-    if (ret.length == expectedReturn.length) {
+    if (retStringAndPosArray.length == expectedReturn.length) {
         for (index3 = 0; index3 < expectedReturn.length; index3++) {
-            var isMatching = (ret[index3] === expectedReturn[index3]);
+            var isMatching = (retStringAndPosArray[index3].stringFound === expectedReturn[index3]);
             thereWasError = thereWasError || !isMatching;
          };
     }
@@ -372,13 +372,13 @@ function validateRecursiveAll(storedText, allPageText, minMatchLength, expectedR
     }
 }
 
-// returns an array of strings in the order they were found in page
+// returns an array of objects (string + position in page) in the order they were found in page
 function findAllMatches(storedText, allPageText, minMatchLength) {
     // prepare
     var jump = Math.floor (minMatchLength / 2);
     var currBeg = jump -1; // start farter than the position 0, since the algorithm will check before that point anyway
     var pageLength = allPageText.length;
-    var stringArray= []; // no string
+    var stringAndPosArray= []; // no string found up to now
     
     // while not after the end of the page
     while (currBeg + jump < pageLength) {
@@ -396,8 +396,13 @@ function findAllMatches(storedText, allPageText, minMatchLength) {
         
         // put it in return structure only if the length is long enough
         if ((retString.wasFound) && (matchString.length >= minMatchLength)) {
-            // Store
-            stringArray.push(matchString);            
+            // Store 
+            var stringAndPos = {
+                stringFound  : matchString,
+                begPosInPage : retString.begPos, 
+                endPosInPage : retString.endPos // position of the last char that matchs 
+            };
+            stringAndPosArray.push(stringAndPos);            
             // set the new start point to after the end of the match
             currBeg = retString.endPos + jump;
         }
@@ -409,7 +414,7 @@ function findAllMatches(storedText, allPageText, minMatchLength) {
 
         // continue the while
     };
-    return stringArray;
+    return stringAndPosArray;
 }
 
 // returns -1 if not found

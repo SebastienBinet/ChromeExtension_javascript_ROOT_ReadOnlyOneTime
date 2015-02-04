@@ -2,7 +2,7 @@
 //console.log("Injection of content_script_periodic.js - started");
 // This script is injected in all pages.
 
-var MIN_SIZE_FOR_MATCH = 8;
+var MIN_SIZE_FOR_MATCH = 4;
 var JUMPS_WHEN_FAST_FINDING = Math.floor(MIN_SIZE_FOR_MATCH / 2);
 
 /////////////// BON: met chaque paragraph à une douleur différente. Mais ne traite pas correctement les &nbsp;
@@ -19,7 +19,7 @@ var JUMPS_WHEN_FAST_FINDING = Math.floor(MIN_SIZE_FOR_MATCH / 2);
 //}
 
 var indexInArrayOfMatchs = 0;
-var allMatchStrings = [];
+var allMatchStringsAndPos = [];
 var storageLength = -1;
 
 function autoReschedulingPeriodicGreying() {
@@ -34,26 +34,26 @@ function autoReschedulingPeriodicGreying() {
     // save processing time if no change in storage
     if (currentLocaleStorageText && (currentLocaleStorageText.length != storageLength)) {
         storageLength = currentLocaleStorageText.length;
-        var minMatchLength = 8;
+        var minMatchLength = MIN_SIZE_FOR_MATCH;
         console.log("1");
-        var retStrings = findAllMatches(currentLocaleStorageText, allPageText, minMatchLength);
-        allMatchStrings = retStrings;
+        var retStringAndPosArray = findAllMatches(currentLocaleStorageText, allPageText, minMatchLength);
+        allMatchStringsAndPos = retStringAndPosArray;
     }
     console.log(" 2");
-//    for(var index=0; index < allMatchStrings.length; index++) {
-//        var stringToGrey = allMatchStrings[index];
-//        putInGreyAllElementsInPageHavingThisString(stringToGrey);
-//        //console.log(stringToGrey);
+//    for(var index=0; index < allMatchStringsAndPos.length; index++) {
+//        var stringAndPosToGrey = allMatchStringsAndPos[index].stringFound;
+//        putInGreyAllElementsInPageHavingThisString(stringAndPosToGrey);
+//        //console.log(stringAndPosToGrey);
 //    }
     
     // only if exists
-    if (allMatchStrings && allMatchStrings.length) {
-        var stringToGrey = allMatchStrings[(indexInArrayOfMatchs++) % allMatchStrings.length];
-        console.log("               " + stringToGrey);
+    if (allMatchStringsAndPos && allMatchStringsAndPos.length) {
+        var stringAndPosToGrey = allMatchStringsAndPos[(indexInArrayOfMatchs++) % allMatchStringsAndPos.length];
+        console.log("               " + stringAndPosToGrey.stringFound + " from " + stringAndPosToGrey.begPosInPage + " to " + stringAndPosToGrey.endPosInPage);
 
         // grey only if valid string
-        if(stringToGrey) {
-            putInGreyAllElementsInPageHavingThisString(stringToGrey);
+        if(stringAndPosToGrey) {
+            putInGreyAllElementsInPageHavingThisString(stringAndPosToGrey);
             console.log("  3");
         }
     }
