@@ -33,12 +33,12 @@ function performOnAllElementsInPageWhenExtensionIconIsPressed(functionToPerform)
 	var bcolor = 0;
 	while (t = tags[i++]) {
 
-var b=t.textContent;
-var posMatchInB = b.indexOf("his code assign");
-if (posMatchInB >= 0) {
-// there is a match
-var i =0;
-}	
+        var b=t.textContent;
+        var posMatchInB = b.indexOf("his code assign");
+        if (posMatchInB >= 0) {
+            // there is a match
+            var i =0;
+        }	
 		if (t.childNodes[0] && (t.nodeName != "SCRIPT") ) {
 			var j = 0;
 			if (t.children.length == 0) {

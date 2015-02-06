@@ -11,6 +11,25 @@ span.ROOT {
 </head>
 
 <body>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("div").find("*").css({"color": "red", "border": "2px solid red"});
+});
+</script>
+</head>
+<body>
+
+<div class="descendants" style="width:500px;">div (current element) 
+  <p>p (child)
+    <span>span (grandchild)</span>     
+  </p>
+  <p>p (child)
+    <span>span (grandchild)</span>
+  </p> 
+</div>
+    
 <div>yyyy<span>zzz</span><span>ZZZ</span></div>  
 <div id="myDiv">This is <span style="background-color: rgb(211, 255, 230);">a di</span>v element.</div>
 <br>

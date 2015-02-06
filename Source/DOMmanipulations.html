@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- bof: draw a box around each visible element --- problems:
+    prints a box for the <html>
+    prints a box for the <head>
+    prints a box for styles (and a box for each one)
+    prints a box for scripts (and a box for each one)
+<!--
+<style>
+* { 
+    display: block;
+    border: 2px solid lightgrey;
+    color: lightgrey;
+    padding: 5px;
+    margin: 15px;
+}
+</style>
+-->
+    
+    
+<!-- bof: draw a box around each visible element --- problems:
+    prints the scripts that are inside the body (and a box for each one)
+-->
+<!--
+<style>
+body * { 
+    display: block;
+    border: 2px solid lightgrey;
+    color: lightgrey;
+    padding: 5px;
+    margin: 15px;
+}
+</style>
+-->
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script>
+var ROOT_COLOR_STRING = "rgb(211, 255, 230)";    
+var ROOT_HIGHLIGHT = "2px solid rgba(211, 255, 230,0.2)"
+var arrayOfAnalysedElements =[];
+
+var exampleOfOneElementInfo = {
+    node : null,
+    charactersInThisElement : '',
+    isTheElementAlreadyAllRooted : false,
+    DOMlevel : -1, // 1 means body,
+    matchs : [], 
+};
+    
+var exampleOfOneMatchInfo = {
+    begPos : -1, // 0 is the first character in this 
+    endPos : -1
+};
+    
+// get all elements in page that are important
+function getAllUsefulElements() { // all the body, except the scripts 
+    var x = $("body *").not("script").toArray();
+    
+    return x;
+}
+
+function greyAllElements() {
+    // works: log (1 seule fois) tout le text qu'il y a d'affiché
+    console.log("<br>" + $("body *").not("script").text());
+    
+    
+    
+    console.log("<br>================================");
+    
+    // works: put a red box around each element (so at each layer)
+//    $("body *").not("script").css({"border": "2px solid lightblue"});
+//    $("body *").not("script").css({"border": "2px solid rgba(211, 255, 230,0.9)"});
+    $("body *").not("script").css({"border": ROOT_HIGHLIGHT});
+//    console.log("<br>" + $("body *").not("script").text());
+//    $("body *").not("script").css("background-color", "yellow");
+}
+    
+// Parse the array of elements and anlayze the text in it
+function analyseArrayOfAllElements(arrayOfSimpleElements) {
+    for (i = 0; i< arrayOfSimpleElements.length; i++) {
+        arrayOfAnalysedElements[i].node = arrayOfSimpleElements[i];
+        arrayOfAnalysedElements[i].characters = 
+        arrayOfSimpleElements[i]
+        .clone()    //clone the element
+ //       .not("script")
+        .children() //select all the children
+        .remove()   //remove all the children
+        .end()  //again go back to selected element
+        .text();
+        
+//        arrayOfAnalysedElements[i].node.
+//        if (arrayOfSimpleElements[i].css("color") == ROOT_COLOR) {
+//            
+//        }
+    }
+}
+    
+       
+$(document).ready(function(){
+    greyAllElements();
+    var fullArray = getAllUsefulElements();
+    console.log(fullArray.text().join());
+    var temp11 = getAllUsefulElements();
+    var temp22 = analyseArrayOfAllElements(temp11);
+});
+    
+    
+    
+    
+    
+    
+//$(document).ready(function(){
+//    $("button").click(function(){
+//        var i;
+//        var x = $("body *").not("ul").toArray()
+//        for (i = 0; i< x.length; i++) {
+//            alert(x[i].innerHTML);
+//        }
+//    });
+//});
+//alert("Text: " + $("#ull").text());
+</script>
+</head>
+<body>
+
+<button>Alert the value of each list item</button>
+
+<ul id="ull" style="background-color: rgb(211, 25, 23);">
+    text directement dans ul
+  <li>Coffee</li>
+  <li><span style="background-color: rgba(211, 255, 230,0.5);">Milk</span></li>
+  <li>Soda</li>
+</ul>
+
+
+    
+<script>
+$(document).ready(function(){
+    $("#btn1").click(function(){
+    var tmp1 =    $("#ull")
+    .clone()    //clone the element
+    .children() //select all the children
+    .remove()   //remove all the children
+    .end()  //again go back to selected element
+    .text();
+        alert("Text1: " + tmp1);
+     });
+
+    
+    $("#btn2").click(function(){
+   var tmp1 =    $("body *")
+    .clone()    //clone the element
+    .not("script")
+    .children() //select all the children
+    .remove()   //remove all the children
+    .end()  //again go back to selected element
+    .text();
+        alert("Text2: " + tmp1);
+    });
+});
+</script>
+</head>
+<body>
+<ul id="ull2">
+text dans le ul
+</ul>
+
+<p id="test">This is some <b>bold</b> text in a paragraph.</p>
+
+<button id="btn1">Show Text</button>
+<button id="btn2">Show HTML</button>
+
+
+</body>
+</html>

@@ -7,7 +7,9 @@
 
 
   "background": {
-    "scripts": ["background.js", "content_script_save_all_in_page.js"],
+    "scripts": ["background.js"],
+//    "scripts": ["background.js", "content_script_save_all_in_page.js"],
+//    "scripts": ["storageAccesses.js", "background.js", "content_script_save_all_in_page.js", "reset_storage_and_reload.js"],
     "persistent": false
   },
 
@@ -22,11 +24,14 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["recusiveStringFunctions.js", "content_script_shared.js", "findAndReplaceDOMText.js", "content_script_periodic.js", "content_script_UI.js"]
+//      "js": ["recusiveStringFunctions.js", "content_script_shared.js", "findAndReplaceDOMText.js", "content_script_periodic.js", "content_script_UI.js"]
+      "js": ["jquery-1.11.2.js", "DOMmanipulations.js", "storageAccesses.js", "content_script_periodic.js"]
     }
   ],
   "permissions": [
-//    "tabs", "activeTab", "http://*/*.hostname", "http://*/", "http://*/*", "https://*/*.hostname", "https://*/*" 
-   "tabs", "activeTab", "http://*/*.hostname", "http://*/", "http://*/*", "https://*/*.hostname", "https://*/*", "file:///*", "file:///*/*", "file:///*/*/*", "file:///*.hostname" 
+    "tabs", "activeTab", "http://*/*.hostname", "http://*/", "http://*/*", "https://*/*.hostname", "https://*/*" 
+//   "tabs", "activeTab", "http://*/*.hostname", "http://*/", "http://*/*", "https://*/*.hostname", "https://*/*", "file:///*", "file:///*/*", "file:///*/*/*", "file:///*.hostname" 
   ]
 }
+
+//    "tabs", "activeTab", "http://*/*.hostname", "http://*/", "http://*/*", "https://*/*.hostname", "https://*/*" 

@@ -7,21 +7,11 @@ function clickListener(clickInfo){
   chrome.tabs.get(tabId_, chromeTabGetFunctionCallback);
 }
 
-function getTimeNow() {
-    return  (new Date()).getTime() % 65536;
-}
-
 // Called in active tab context when extension icon is clicked
 function chromeTabGetFunctionCallback(tab){	 
-    
-    chrome.tabs.executeScript({code: "resetStorage();"});
-    if(1) console.log("0=  " + getTimeNow() + "ms");
-    chrome.tabs.executeScript({code: "location.reload();"});
-    if(1) console.log("0== " + getTimeNow() + "ms");
+	 // Execute the greyAll() in the script file
+     chrome.tabs.executeScript({file: "content_script_save_all_in_page.js"});
 }
-
-
-
 
 /////////////////////////////////////////
 chrome.browserAction.onClicked.addListener(clickListener);
