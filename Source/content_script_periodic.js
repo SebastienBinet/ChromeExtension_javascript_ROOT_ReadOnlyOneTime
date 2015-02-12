@@ -1,5 +1,5 @@
 "use strict";
-if(1) console.log("0   " + getTimeNow() + "ms");
+if(0) console.log("0   " + getTimeNow() + "ms");
 //console.log("Injection of content_script_periodic.js - started");
 // This script is injected in all pages.
 
@@ -38,8 +38,9 @@ function getTimeNow() {
 
 }
 function autoReschedulingPeriodicGreying() {
-    if(1) console.log("autoReschedulingPeriodicGreying starting");
-    if(1) console.log("1   " + getTimeNow() + "ms");
+    if(0) console.log("autoReschedulingPeriodicGreying starting");
+    if(0) console.log("1   " + getTimeNow() + "ms");
+//#if 0
    
     // get an array of all elements in the page.
     FullArray = getAllUsefulElements();
@@ -47,33 +48,110 @@ function autoReschedulingPeriodicGreying() {
     
     
     
-    if(1) console.log("1+  " + getTimeNow() + "ms");
+    if(0) console.log("1+  " + getTimeNow() + "ms");
 
     // get storage text
     var  allTextFromStorage = getAllTextFromStorage();
     var qty = howManyPagesAreCurrentlyOpenedOnThisSite();
-    if(2) console.log(" 2  " + getTimeNow() + "ms, nb pages opened=" + qty + ", local storage size=" + allTextFromStorage.length);
+    if(0) console.log(" 2  " + getTimeNow() + "ms, nb pages opened=" + qty + ", local storage size=" + allTextFromStorage.length);
     
-    // parse all elements and grey them if they are found in storage 
-    for (i = 0; i< FullArray.length; i++) {
+    // parse all elements and grey them if they are found in storage
+    var i;
+//    for (i = 0; i< FullArray.length; i++) {
         // get text of one element
-        var element_i = FullArray[i];
-        var text_element_i = element_i.innerText;
-        
-        // check if the text of this element is not empty and found in the Storage
-        var found = ((text_element_i.length > 0) && (allTextFromStorage.indexOf(text_element_i) >= 0));
-        
-        // if found, put it in grey
-        if (found) {
-            setElementWithRootStyle(element_i);
-        }
+//        var element_i = FullArray[i];
+    
+    // start at top, and parse until the end
+    var element_body = $("body")[0];
+    var element_i = element_body.children[0];
 
+    while (element_i) {
+        var next_element = null;
+        var text_element_i = element_i.innerText;
+        var afterThisElement_stopGoingDown = false;
+        
+        if (text_element_i != null) {
+            // check that there is text in this element or in its children
+            var positionOfLongAlphabeticStringInTree = text_element_i.search(/[A-Z]{2,}/i);
+            var thereIsUsefulTextInThisTree = positionOfLongAlphabeticStringInTree >= 0;
+
+
+            // check if there is enough consecutive characters (in this element and its children tree) to be considered a text element
+            if (thereIsUsefulTextInThisTree) {
+                // check if the text of this element is not empty and found in the Storage
+                var isTreeAllFound = ((text_element_i.length > 0) && (allTextFromStorage.indexOf(text_element_i) >= 0));
+                // if all text inside this node (includes all children tree) was found in storage
+                if (isTreeAllFound) {
+                    // check that there is long enough text directly in this element
+                    var thereIsUsefulTextDirectly = false;
+                    var iiii;
+                    for (iiii = 0; iiii < element_i.childNodes.length; iiii++) {
+                        if ((element_i.childNodes[iiii].nodeName === "#text") && (element_i.childNodes[iiii].wholeText.search(/[A-Z]{2,}/i) >= 0)) {
+                            thereIsUsefulTextDirectly = true;
+                        }
+                    }
+                    // last child if there is no child or if there is 0 child
+                    var lastChild = (element_i && (!element_i.children || (element_i.children.length === 0)));
+                    // if found and there are long enough text directly at this level, put it in grey
+                    if(thereIsUsefulTextDirectly || lastChild) {
+                        setElementWithRootStyleUsefulTextDirectly(element_i);
+                        // we do not need to parse children, so try to go to next sibbling
+                        afterThisElement_stopGoingDown = true;
+                    } else {
+                        setElementWithRootStyleUsefulNoTextDirectly(element_i);
+                    }
+                }
+            }
+            
+            // get the next element to analyze
+            while (next_element == null ) {
+                if (afterThisElement_stopGoingDown) {
+                    // try to go to next at the same level
+                    if (element_i.nextElementSibling != null) {
+                        // found at same level
+                        next_element = element_i.nextElementSibling;
+                    } else {
+                        // need to go up
+                        element_i = element_i.parentElement;
+                     }
+                } else {
+                    // try to go down
+                    if (element_i.firstElementChild != null) {
+                        // go down
+                        next_element = element_i.firstElementChild;
+                    } else {
+                        // try to go to next at the same level
+                        if (element_i.nextElementSibling != null) {
+                            // found at same level
+                            next_element = element_i.nextElementSibling;
+                        } else {
+                            // need to go up
+                            element_i = element_i.parentElement;
+                            afterThisElement_stopGoingDown = true;
+                        }
+                    }
+                } // end else
+                // if at body level, prepare to exit all
+                if (element_i == element_body) {
+                    // came back at body level, so exit all
+                    next_element = element_body;
+                    element_i = null;
+                }
+            } // end while
+            // if not preparing to exit, prepare for going back to while check
+            if (element_i != null) {
+                // normal situation
+                element_i = next_element;
+            }
+        } // end if
+        
         if(0) console.log(">>>[" + i + "] = " + element_i + ":" + text_element_i + "<<<");
-    }
+    } // end while
     
     // prepare for next iteration
-    if(1) console.log("  3 " + getTimeNow() + "ms");
+    if(0) console.log("  3 " + getTimeNow() + "ms");
     setTimeout(autoReschedulingPeriodicGreying, 100);
+//#endif
 }
 
 //function saveElementToStorage( el ) {
@@ -94,7 +172,7 @@ var hoverInfo = {
 function saveAllTextFromEveryElementsOfThisPage() {
     var  stringToAdd = "";
 
-    if(1) console.log("   4" + getTimeNow() + "ms");
+    if(0) console.log("   4" + getTimeNow() + "ms");
     
     for (i = 0; i< FullArray.length; i++) {
         // get text of one element
@@ -102,9 +180,9 @@ function saveAllTextFromEveryElementsOfThisPage() {
         var text_element_i = element_i.innerText;
         stringToAdd += text_element_i;
     }        
-    if(1) console.log("   5" + getTimeNow() + "ms");
+    if(0) console.log("   5" + getTimeNow() + "ms");
     addThisToStorage(stringToAdd);
-    if(1) console.log("   6" + getTimeNow() + "ms");
+    if(0) console.log("   6" + getTimeNow() + "ms");
 }
 
 //
@@ -261,7 +339,7 @@ function setRulesForMarking() {
     $("*").mousemove(function(event){
         var x = event.pageX;
         var y = event.pageY;
-        console.log("x:" + x + ", y:" + y );
+        if (0) console.log("x:" + x + ", y:" + y );
     });
     
     $(window).unload(function(){
@@ -284,7 +362,7 @@ function setRulesForMarking() {
 }
 
 $(document).ready(function(){
-    if(1) console.log("0++ " + getTimeNow() + "ms");
+    if(0) console.log("0++ " + getTimeNow() + "ms");
     //resetStorage();
     incrementNumberOfOpenPagesOnThisSite();
     setRulesForMarking();
@@ -292,12 +370,12 @@ $(document).ready(function(){
     
 //    var temp11 = getAllUsefulElements();
 //    var temp22 = analyseArrayOfAllElements(temp11);
-   if(1) console.log("0+++" + getTimeNow() + "ms");
+   if(0) console.log("0+++" + getTimeNow() + "ms");
     autoReschedulingPeriodicGreying();
 });
     
     
  
-    if(1) console.log("0+  " + getTimeNow() + "ms");
+    if(0) console.log("0+  " + getTimeNow() + "ms");
 
 

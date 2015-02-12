@@ -62,17 +62,17 @@ function getAllUsefulElements() { // all the body, except the scripts
 
 function greyAllElements() {
     // works: log (1 seule fois) tout le text qu'il y a d'affiché
-    console.log("<br>" + $("body *").not("script").text());
+    if (0) console.log("<br>" + $("body *").not("script").text());
     
     
     
-    console.log("<br>================================");
+    if (0) console.log("<br>================================");
     
     // works: put a red box around each element (so at each layer)
 //    $("body *").not("script").css({"border": "2px solid lightblue"});
 //    $("body *").not("script").css({"border": "2px solid rgba(211, 255, 230,0.9)"});
     $("body *").not("script").css({"border": ROOT_HIGHLIGHT});
-//    console.log("<br>" + $("body *").not("script").text());
+//    if (0) console.log("<br>" + $("body *").not("script").text());
 //    $("body *").not("script").css("background-color", "yellow");
 }
     
@@ -100,7 +100,7 @@ function analyseArrayOfAllElements(arrayOfSimpleElements) {
 $(document).ready(function(){
     greyAllElements();
     var fullArray = getAllUsefulElements();
-    console.log(fullArray.text().join());
+    if (0) console.log(fullArray.text().join());
     var temp11 = getAllUsefulElements();
     var temp22 = analyseArrayOfAllElements(temp11);
 });

@@ -1,11 +1,12 @@
-if(1) console.log("0&  " + getTimeNow() + "ms");
+if(0) console.log("0&  " + getTimeNow() + "ms");
 function getTimeNow() {
     return  (new Date()).getTime() % 65536;
 
 }
 
 var ROOT_HIGHLIGHT = "2px solid rgba(211, 255, 230,0.2)"
-var ROOT_BACKGROUND_COLOR = "rgba(185, 200, 200, 0.2)";
+var ROOT_BACKGROUND_COLOR_LAST_CHILD = "rgba(185, 200, 200, 0.9)";
+var ROOT_BACKGROUND_COLOR_NOT_LAST_CHILD = "rgba(255, 200, 200, 0.1)";
 //var ROOT_BACKGROUND_COLOR = "rgb(185, 200, 200)"
 
 
@@ -23,7 +24,7 @@ function greyAllElements() {
 
 function getAllUsefulElements() {
 //    var all = $("body *").not("script").text();
-//    console.log("all = " + all);
+//    if (0) console.log("all = " + all);
     var all = $("body *").not("script");
     for (i = 0; i< all.length; i++) {
         var element_i = all[i];
@@ -34,7 +35,14 @@ function getAllUsefulElements() {
 }
 
 
-function setElementWithRootStyle( el ) {
-    el.style.backgroundColor = ROOT_BACKGROUND_COLOR;
+function setElementWithRootStyleUsefulTextDirectly( el ) {
+    el.style.backgroundColor = ROOT_BACKGROUND_COLOR_LAST_CHILD;
+    el.style.borderRadius = "15px";
+}
+
+function setElementWithRootStyleUsefulNoTextDirectly( el ) {
+    var oneColor = "rgba(" + Math.floor(Math.random()*256) + "," + Math.floor(Math.random()*256) + "," + Math.floor(Math.random()*256) + ",0.01)";
+
+    el.style.backgroundColor = oneColor; //ROOT_BACKGROUND_COLOR_NOT_LAST_CHILD;
     el.style.borderRadius = "25px";
 }
