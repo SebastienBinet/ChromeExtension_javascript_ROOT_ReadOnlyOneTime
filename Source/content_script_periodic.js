@@ -3,17 +3,17 @@ if(0) console.log("0   " + getTimeNow() + "ms");
 //console.log("Injection of content_script_periodic.js - started");
 // This script is injected in all pages.
 
-var ROOT_HIGHLIGHT = "10px solid rgba(211, 255, 230,0.2)";
-var REVERT_HIGHLIGHT = "revert";
-var TEMP_RED_SQUARE = "1px dashed red";
+//var ROOT_HIGHLIGHT = "10px solid rgba(211, 255, 230,0.2)";
+//var REVERT_HIGHLIGHT = "revert";
+//var TEMP_RED_SQUARE = "1px dashed red";
 //var TEMP_RED_SQUARE_BOX = {
 //    "box-sizing": "border-box",
 //    "border": "1px 0px 1px 0px dashed red"
 //    };
 
-var TEMP_RED_SQUARE_BOX = {
-    "background-color": "rgba(0, 255, 0, 0.3)"
-    };
+//var TEMP_RED_SQUARE_BOX = {
+//    "background-color": "rgba(0, 255, 0, 0.3)"
+//    };
 //var TEMP_RED_SQUARE_BOX = {
 //    "border-style": "solid",
 //    "border-color": "red",
@@ -29,11 +29,13 @@ var TEMP_RED_SQUARE_BOX = {
 //var JUMPS_WHEN_FAST_FINDING = Math.floor(MIN_SIZE_FOR_MATCH / 2);
 //var storageLength = -1;
 
-var MIN_PERCENT_ZONE_COVERED_TO_BE_CONSIDERED_AS_READ = 90;
+var MIN_PERCENT_ZONE_COVERED_TO_BE_CONSIDERED_AS_READ = 60;
 
 
-var maxX = -1;
-var maxY = -1;
+var maxX  = -1;
+var maxY  = -1;
+var currX = -1;
+var currY = -1;
 
 function getTimeNow() {
     return  (new Date()).getTime() % 65536;
@@ -48,8 +50,8 @@ function parseAllPageAndGrey() {
     
      // get storage text
     var  allTextFromStorage = getAllTextFromStorage();
-    var qty = howManyPagesAreCurrentlyOpenedOnThisSite();
-    if(0) console.log(" 2  " + getTimeNow() + "ms, nb pages opened=" + qty + ", local storage size=" + allTextFromStorage.length);
+//    var qty = howManyPagesAreCurrentlyOpenedOnThisSite();
+//    if(0) console.log(" 2  " + getTimeNow() + "ms, nb pages opened=" + qty + ", local storage size=" + allTextFromStorage.length);
 
     // start at top, and parse until the end
     var element_body = $("body")[0];
@@ -165,11 +167,11 @@ function isMostOfThisElementInReadZone(el) {
     if (pos.right >= 0 && pos.bottom >= 0) {
         var el_width           = pos.right  - pos.left;
         var el_height          = pos.bottom - pos.top;
-        var limMaxX            = (maxX < pos.right) ? maxX : pos.right;
-        var el_covered_x       = limMaxX - pos.left;
+        var limX               = (currX < pos.right) ? currX : pos.right;
+        var el_covered_x       = limX - pos.left;
             el_covered_x       = (el_covered_x > 0) ? el_covered_x : 0;
-        var limMaxY            = (maxY < pos.bottom) ? maxY : pos.bottom;
-        var el_covered_y       = limMaxY - pos.top;
+        var limY               = (currY < pos.bottom) ? currY : pos.bottom;
+        var el_covered_y       = limY - pos.top;
             el_covered_y       = (el_covered_y > 0) ? el_covered_y : 0;
         var el_surface         = el_width * el_height;
         var el_covered_surface = el_covered_x * el_covered_y;
@@ -183,17 +185,86 @@ function isMostOfThisElementInReadZone(el) {
 }
 
 
-// parse all elements and put a border around them if they are marked as read
-function checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(el) {
-    
-    var retAllInReadZone = true;
+//// parse all elements and put a border around them if they are marked as read
+//function checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(el) {
+//    
+//    var retAllInReadZone = true;
+//    
+//    // check if there are children
+//    var firstChild = el.firstElementChild;
+//    if (firstChild != null) {
+//        // Case there are children
+//        // Check if all children in read zone (start with first child)
+//        if (checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(firstChild)) {
+//            // Case all children are in read zone
+//            // Check if this element is also in read zone
+//            var thisElIsRead = isMostOfThisElementInReadZone(el);
+//            if (thisElIsRead) {
+//                // Case this element and all its children are in read zone
+//                // check if this element has a surface (non-zero area)
+//                if (isThisElementASurfaceWithANonZeroArea(el)) {
+//                    // Display it as read
+//                    displayAsInReadZone(el);
+//                }
+//            } else {// else
+//                // Case this element in not in read zone
+//                // Return "this element is not in read zone"
+//                retAllInReadZone = false;
+//            }
+//        } else { // else of "Check if all children in read zone"
+//            // Case not all children are in read zone
+//            // Return "this element is not in read zone"
+//            retAllInReadZone = false;
+//        } // "Check if all children in read zone"
+//    } else { // else of "check if there are children"
+//        // Case there are not children
+//        // Check if most of this element is in the read zone
+//        var thisElIsRead = isMostOfThisElementInReadZone(el);
+//        if (thisElIsRead) {
+//            // Case most of this element is in the read zone
+//            // check if this element has a surface (non-zero area)
+//            if (isThisElementASurfaceWithANonZeroArea(el)) {
+//                // Display it as read
+//                displayAsInReadZone(el);
+//            }
+//        } else {
+//            // Case not enough of this element is in the read zone
+//            // Return "this element is not in read zone"
+//            retAllInReadZone = false;
+//        }
+//    } // "check if there are children"
+//    
+//    
+//    // if there is a next sibling, process it
+//    var nextSiblingToThisEl = el.nextElementSibling;
+//    if (nextSiblingToThisEl) {
+//        var allSiblingAreInReadZone = checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt (nextSiblingToThisEl);
+//        if (! allSiblingAreInReadZone) {
+//            // Case not all siblings at this level are in the read zone
+//            // Return "not all element are not in read zone"
+//            retAllInReadZone = false;
+//        }
+//    }
+//    
+//    // at this point, all children are analyzed, and all next siblings are analyzed.
+//    return retAllInReadZone;
+//}
+//
+
+function checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(el, currText) {
+    var retAllInReadZone = {
+        isThisElInCurrentReadZone: true,
+        newText: currText
+    };
     
     // check if there are children
     var firstChild = el.firstElementChild;
     if (firstChild != null) {
         // Case there are children
         // Check if all children in read zone (start with first child)
-        if (checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(firstChild)) {
+        var ret001 = checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(firstChild, retAllInReadZone.newText);
+        retAllInReadZone.newText = ret001.newText;
+        if (ret001.isThisElInCurrentReadZone) {
             // Case all children are in read zone
             // Check if this element is also in read zone
             var thisElIsRead = isMostOfThisElementInReadZone(el);
@@ -201,18 +272,32 @@ function checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(el) {
                 // Case this element and all its children are in read zone
                 // check if this element has a surface (non-zero area)
                 if (isThisElementASurfaceWithANonZeroArea(el)) {
-                    // Display it as read
-                    displayAsInReadZone(el);
+                    // Case nonZeroArea
+                    // Check if there is innerText
+                    var inText = el.innerText;
+                    if (inText != null) {
+                        // case there is inner text
+                        // check if there is useful characters to save
+                        var enoughChars = (inText.search(/[A-Z]{2,}/i) >= 0);
+                        if (enoughChars === true) {
+                            // Case there are enough chars, we need to store the text
+                            // check if already in storage
+                            var alreadyInStorage = (retAllInReadZone.newText.indexOf(inText) >= 0);
+                            if (!alreadyInStorage) {
+                                retAllInReadZone.newText += inText;
+                            }
+                        }
+                    }
                 }
             } else {// else
                 // Case this element in not in read zone
                 // Return "this element is not in read zone"
-                retAllInReadZone = false;
+                retAllInReadZone.isThisElInCurrentReadZone = false;
             }
         } else { // else of "Check if all children in read zone"
             // Case not all children are in read zone
             // Return "this element is not in read zone"
-            retAllInReadZone = false;
+            retAllInReadZone.isThisElInCurrentReadZone = false;
         } // "Check if all children in read zone"
     } else { // else of "check if there are children"
         // Case there are not children
@@ -222,13 +307,27 @@ function checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(el) {
             // Case most of this element is in the read zone
             // check if this element has a surface (non-zero area)
             if (isThisElementASurfaceWithANonZeroArea(el)) {
-                // Display it as read
-                displayAsInReadZone(el);
-            }
+                // Case nonZeroArea
+                // Check if there is innerText
+                var inText = el.innerText;
+                if (inText != null) {
+                    // case there is inner text
+                    // check if there is useful characters to save
+                    var enoughChars = (inText.search(/[A-Z]{2,}/i) >= 0);
+                    if (enoughChars === true) {
+                        // Case there are enough chars, we need to store the text
+                        // check if already in storage
+                        var alreadyInStorage = (retAllInReadZone.newText.indexOf(inText) >= 0);
+                        if (!alreadyInStorage) {
+                            retAllInReadZone.newText += inText;
+                        }
+                    }
+                }
+           }
         } else {
             // Case not enough of this element is in the read zone
             // Return "this element is not in read zone"
-            retAllInReadZone = false;
+            retAllInReadZone.isThisElInCurrentReadZone = false;
         }
     } // "check if there are children"
     
@@ -236,111 +335,42 @@ function checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(el) {
     // if there is a next sibling, process it
     var nextSiblingToThisEl = el.nextElementSibling;
     if (nextSiblingToThisEl) {
-        var allSiblingAreInReadZone = checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt (nextSiblingToThisEl);
+        var ret002 = checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt (nextSiblingToThisEl, retAllInReadZone.newText);
+        retAllInReadZone.newText = ret002.newText;
+        var allSiblingAreInReadZone = ret002.isThisElInCurrentReadZone;
         if (! allSiblingAreInReadZone) {
             // Case not all siblings at this level are in the read zone
             // Return "not all element are not in read zone"
-            retAllInReadZone = false;
+            retAllInReadZone.isThisElInCurrentReadZone = false;
         }
     }
     
-    // at this point, all child are analyzed, and all next siblings are analyzed.
+    // at this point, all children are analyzed, and all next siblings are analyzed.
     return retAllInReadZone;
 }
     
-function parseAllPAgeAndDisplayReadZone() {
+//function parseAllPAgeAndDisplayReadZone() {
+//    var firstUsefulElement = $("body *").not("script")[0];
+//    checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(firstUsefulElement);
+//}
+
+
+function parseAllPageAndSaveTextInCurrentReadingZone() {
     var firstUsefulElement = $("body *").not("script")[0];
-    checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(firstUsefulElement);
-    
-//    var i;
-//    
-//    
-//    
-//    
-//    
-//    
-//    // start at lowest possible level, and parse until the end
-//    var element_body = $("body")[0];
-//    
-//    var element_i = walkUntilLastchildre(element_body.children[0];
-//
-//    while (element_i) {
-//        var next_element = null;
-//        var text_element_i = element_i.innerText;
-//        var afterThisElement_stopGoingDown = false;
-//        
-//        if (text_element_i != null) {
-//
-//
-//                    // check that there is long enough text directly in this element
-//                    var thereIsUsefulTextDirectly = false;
-//                    var iiii;
-//                    for (iiii = 0; iiii < element_i.childNodes.length; iiii++) {
-//                        if ((element_i.childNodes[iiii].nodeName === "#text") && (element_i.childNodes[iiii].wholeText.search(/[A-Z]{2,}/i) >= 0)) {
-//                            thereIsUsefulTextDirectly = true;
-//                        }
-//                    }
-//                    // last child if there is no child or if there is 0 child
-//                    var lastChild = (element_i && (!element_i.children || (element_i.children.length === 0)));
-//                    // if found and there are long enough text directly at this level, put it in grey
-//                    if(thereIsUsefulTextDirectly || lastChild) {
-//                        setElementWithRootStyleUsefulTextDirectly(element_i);
-//                        // we do not need to parse children, so try to go to next sibbling
-//                        afterThisElement_stopGoingDown = true;
-//                    } else {
-//                        setElementWithRootStyleUsefulNoTextDirectly(element_i);
-//                    }
-//            
-//            // get the next element to analyze
-//            while (next_element == null ) {
-//                if (afterThisElement_stopGoingDown) {
-//                    // try to go to next at the same level
-//                    if (element_i.nextElementSibling != null) {
-//                        // found at same level
-//                        next_element = element_i.nextElementSibling;
-//                    } else {
-//                        // need to go up
-//                        element_i = element_i.parentElement;
-//                     }
-//                } else {
-//                    // try to go down
-//                    if (element_i.firstElementChild != null) {
-//                        // go down
-//                        next_element = element_i.firstElementChild;
-//                    } else {
-//                        // try to go to next at the same level
-//                        if (element_i.nextElementSibling != null) {
-//                            // found at same level
-//                            next_element = element_i.nextElementSibling;
-//                        } else {
-//                            // need to go up
-//                            element_i = element_i.parentElement;
-//                            afterThisElement_stopGoingDown = true;
-//                        }
-//                    }
-//                } // end else
-//                // if at body level, prepare to exit all
-//                if (element_i == element_body) {
-//                    // came back at body level, so exit all
-//                    next_element = element_body;
-//                    element_i = null;
-//                }
-//            } // end while
-//            // if not preparing to exit, prepare for going back to while check
-//            if (element_i != null) {
-//                // normal situation
-//                element_i = next_element;
-//            }
-//        } // end if
-//        if(0) console.log(">>>[" + i + "] = " + element_i + ":" + text_element_i + "<<<");
-//    } // end while
-   
+    // sanity check
+    if (firstUsefulElement != null) {
+        var currentTextInStorage = getAllTextFromStorage();
+        var ret003 = checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(firstUsefulElement, currentTextInStorage);
+        var textToPutInStorage = ret003.newText;
+        replaceStorage(textToPutInStorage);
+    }
 }
 
 function autoReschedulingPeriodicGreying() {
     if(0) console.log("autoReschedulingPeriodicGreying starting");
     if(0) console.log("1   " + getTimeNow() + "ms");
-    parseAllPAgeAndDisplayReadZone();
+//    parseAllPAgeAndDisplayReadZone();
+    parseAllPageAndSaveTextInCurrentReadingZone();
     parseAllPageAndGrey();
     if(0) console.log("  3 " + getTimeNow() + "ms");
     setTimeout(autoReschedulingPeriodicGreying, 100);
@@ -361,24 +391,24 @@ var hoverInfo = {
 };
 
 
-function saveAllTextFromEveryElementsOfThisPage() {
-    var  stringToAdd = "";
-
-    if(0) console.log("   4" + getTimeNow() + "ms");
-    
-    // get an array of all elements in the page.
-    var FullArray = getAllUsefulElements();
-    
-    for (i = 0; i< FullArray.length; i++) {
-        // get text of one element
-        var element_i = FullArray[i];
-        var text_element_i = element_i.innerText;
-        stringToAdd += text_element_i;
-    }        
-    if(0) console.log("   5" + getTimeNow() + "ms");
-    addThisToStorage(stringToAdd);
-    if(0) console.log("   6" + getTimeNow() + "ms");
-}
+//function saveAllTextFromEveryElementsOfThisPage() {
+//    var  stringToAdd = "";
+//
+//    if(0) console.log("   4" + getTimeNow() + "ms");
+//    
+//    // get an array of all elements in the page.
+//    var FullArray = getAllUsefulElements();
+//    
+//    for (i = 0; i< FullArray.length; i++) {
+//        // get text of one element
+//        var element_i = FullArray[i];
+//        var text_element_i = element_i.innerText;
+//        stringToAdd += text_element_i;
+//    }        
+//    if(0) console.log("   5" + getTimeNow() + "ms");
+//    addThisToStorage(stringToAdd);
+//    if(0) console.log("   6" + getTimeNow() + "ms");
+//}
 
 //
 //$("body *").not("script").css({"border": ROOT_HIGHLIGHT});
@@ -524,36 +554,42 @@ function setRulesForMarking() {
             enter_el(this);
         }
     );
-    $("*").mouseleave(
+    
+    $("body").mouseleave(function(evt) {
+        currX = -1;
+        currY = -1;
+    });
+
+    $("*").not("body").mouseleave(
         function(evt){
-            evt.stopPropagation();
+    //        evt.stopPropagation();
             leave_el(this);
         }
     );
 
     $("*").mousemove(function(event){
-        var x = event.pageX;
-        var y = event.pageY;
-        maxX = x > maxX ? x : maxX;
-        maxY = y > maxY ? y : maxY;
-        if (1) console.log("x:" + x + ", y:" + y +" maxX:" + maxX + ", maxY:" + maxY );
+        currX = event.pageX;
+        currY = event.pageY;
+        maxX = currX > maxX ? currX : maxX;
+        maxY = currY > maxY ? currY : maxY;
+        if (1) console.log("x:" + currX + ", y:" + currY +" maxX:" + maxX + ", maxY:" + maxY );
     });
     
     $(window).unload(function(){
         
-        // was this the last page openned on that site?
-        var isLast = isThisTheLastPageOnThisSite();
-        if (isLast) {
-            // reset the storage
-            resetStorage();
-        } else {
-            // add the text of this page to the storage
-            saveAllTextFromEveryElementsOfThisPage();
-        }
-        
-        
-        // in all cases, take note that this page is closing
-        decrementNumberOfOpenPagesOnThisSite();
+//        // was this the last page opened on that site?
+//        var isLast = isThisTheLastPageOnThisSite();
+//        if (isLast) {
+//            // reset the storage
+//            resetStorage();
+//        } else {
+//            // add the text of this page to the storage
+//            saveAllTextFromEveryElementsOfThisPage();
+//        }
+//        
+//        
+//        // in all cases, take note that this page is closing
+//        decrementNumberOfOpenPagesOnThisSite();
         
     });
 }
@@ -561,7 +597,7 @@ function setRulesForMarking() {
 $(document).ready(function(){
     if(0) console.log("0++ " + getTimeNow() + "ms");
     //resetStorage();
-    incrementNumberOfOpenPagesOnThisSite();
+//    incrementNumberOfOpenPagesOnThisSite();
     setRulesForMarking();
 //    greyAllElements();
     

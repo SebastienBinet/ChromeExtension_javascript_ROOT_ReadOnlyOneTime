@@ -19,7 +19,7 @@ function getAllTextFromStorage() {
 function resetStorage() {
 	if (typeof (Storage) !== "undefined") {
 		// Store
-        localStorage.setItem("B4D.test001.name", "EMPTY");
+        replaceStorage("EMPTY");
         localStorage.setItem("B4D.test001.numberOfOpenPages", 0);
         if(1) console.log("size of locale storage: 0");
         if(1) console.log("0%% " + getTimeNow() + "ms");
@@ -30,64 +30,73 @@ function resetStorage() {
 function addThisToStorage( textToAdd ) {
 	if (typeof (Storage) !== "undefined") {
 		// Retrieve
-        var currentLocaleStorageText = localStorage.getItem("B4D.test001.name");
+        var currentLocaleStorageText = getAllTextFromStorage();
 		// Store
         var newText = currentLocaleStorageText + textToAdd;
-        localStorage.setItem("B4D.test001.name", newText);
+        replaceStorage(newText);
         if(1) console.log("size of locale storage:" + newText.length);
         
     }    
     
 }
 
-
-function incrementNumberOfOpenPagesOnThisSite() {
-    if (typeof (Storage) !== "undefined") {
-		// Retrieve
-        var currentLocaleValueString = localStorage.getItem("B4D.test001.numberOfOpenPages");
-        var currentLocaleValue = parseInt(currentLocaleValueString);
-		// Store
-        var newLocaleValue = currentLocaleValue + 1;
-        localStorage.setItem("B4D.test001.numberOfOpenPages", newLocaleValue);
+function replaceStorage( textToStore ) {
+	if (typeof (Storage) !== "undefined") {
+        localStorage.setItem("B4D.test001.name", textToStore);
+        if(1) console.log("size of locale storage:" + textToStore.length);
+        
     }    
-
-}
-
-function decrementNumberOfOpenPagesOnThisSite() {
-    if (typeof (Storage) !== "undefined") {
-		// Retrieve
-        var currentLocaleValueString = localStorage.getItem("B4D.test001.numberOfOpenPages");
-        var currentLocaleValue = parseInt(currentLocaleValueString);
-		// Store if it make sense
-        if (currentLocaleValue >= 1) {
-            var newLocaleValue = currentLocaleValue - 1;
-            localStorage.setItem("B4D.test001.numberOfOpenPages", newLocaleValue);
-        } else {
-            localStorage.setItem("B4D.test001.numberOfOpenPages", 0);
-        }
-    }    
-
-}
-
-function isThisTheLastPageOnThisSite() {
-    var isLastOne = true;
-    if (typeof (Storage) !== "undefined") {
-		// Retrieve
-        var currentLocaleValueString = localStorage.getItem("B4D.test001.numberOfOpenPages");
-        var currentLocaleValue = parseInt(currentLocaleValueString);
-		
-        isLastOne = !(currentLocaleValue >= 1);
-    }    
-    return isLastOne;
+    
 }
 
 
-function howManyPagesAreCurrentlyOpenedOnThisSite() {
-    var qty = -1;
-    if (typeof (Storage) !== "undefined") {
-		// Retrieve
-        var currentLocaleValueString = localStorage.getItem("B4D.test001.numberOfOpenPages");
-        qty = parseInt(currentLocaleValueString);
-    }    
-    return qty;
-}
+//function incrementNumberOfOpenPagesOnThisSite() {
+//    if (typeof (Storage) !== "undefined") {
+//		// Retrieve
+//        var currentLocaleValueString = localStorage.getItem("B4D.test001.numberOfOpenPages");
+//        var currentLocaleValue = parseInt(currentLocaleValueString);
+//		// Store
+//        var newLocaleValue = currentLocaleValue + 1;
+//        localStorage.setItem("B4D.test001.numberOfOpenPages", newLocaleValue);
+//    }    
+//
+//}
+
+//function decrementNumberOfOpenPagesOnThisSite() {
+//    if (typeof (Storage) !== "undefined") {
+//		// Retrieve
+//        var currentLocaleValueString = localStorage.getItem("B4D.test001.numberOfOpenPages");
+//        var currentLocaleValue = parseInt(currentLocaleValueString);
+//		// Store if it make sense
+//        if (currentLocaleValue >= 1) {
+//            var newLocaleValue = currentLocaleValue - 1;
+//            localStorage.setItem("B4D.test001.numberOfOpenPages", newLocaleValue);
+//        } else {
+//            localStorage.setItem("B4D.test001.numberOfOpenPages", 0);
+//        }
+//    }    
+//
+//}
+
+//function isThisTheLastPageOnThisSite() {
+//    var isLastOne = true;
+//    if (typeof (Storage) !== "undefined") {
+//		// Retrieve
+//        var currentLocaleValueString = localStorage.getItem("B4D.test001.numberOfOpenPages");
+//        var currentLocaleValue = parseInt(currentLocaleValueString);
+//		
+//        isLastOne = !(currentLocaleValue >= 1);
+//    }    
+//    return isLastOne;
+//}
+
+
+//function howManyPagesAreCurrentlyOpenedOnThisSite() {
+//    var qty = -1;
+//    if (typeof (Storage) !== "undefined") {
+//		// Retrieve
+//        var currentLocaleValueString = localStorage.getItem("B4D.test001.numberOfOpenPages");
+//        qty = parseInt(currentLocaleValueString);
+//    }    
+//    return qty;
+//}
