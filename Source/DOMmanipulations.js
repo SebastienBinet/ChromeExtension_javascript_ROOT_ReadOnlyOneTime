@@ -8,6 +8,7 @@ var ROOT_HIGHLIGHT = "2px solid rgba(211, 255, 230,0.2)"
 var ROOT_BACKGROUND_COLOR_LAST_CHILD = "rgba(185, 200, 200, 0.9)";
 var ROOT_BACKGROUND_COLOR_NOT_LAST_CHILD = "rgba(255, 200, 200, 0.1)";
 //var ROOT_BACKGROUND_COLOR = "rgb(185, 200, 200)"
+var READ_SQUARE_BOX = "1px 0px 1px 0px dashed red";
 
 
 function greyAllElements() {
@@ -40,9 +41,28 @@ function setElementWithRootStyleUsefulTextDirectly( el ) {
     el.style.borderRadius = "15px";
 }
 
+function setElementWithBackgroundBlue( el ) {
+    el.style.backgroundColor = "blue";
+    el.style.borderRadius = "1px";
+}
+function setElementWithBackgroundRed( el ) {
+    el.style.backgroundColor = "red";
+    el.style.borderRadius = "1px";
+}
+
+
 function setElementWithRootStyleUsefulNoTextDirectly( el ) {
     var oneColor = "rgba(" + Math.floor(Math.random()*256) + "," + Math.floor(Math.random()*256) + "," + Math.floor(Math.random()*256) + ",0.01)";
 
     el.style.backgroundColor = oneColor; //ROOT_BACKGROUND_COLOR_NOT_LAST_CHILD;
     el.style.borderRadius = "25px";
+}
+
+function displayAsInReadZone( el ) {
+    el.style.boxSizing = "border-box";
+//    el.style.border = READ_SQUARE_BOX;
+    el.style.borderTop = "1px dashed lightgreen";
+    el.style.borderLeft = "1px dashed lightgreen";
+    el.style.borderRight = "1px dashed lightgreen";
+    el.style.borderBottom = "1px dashed lightgreen";
 }

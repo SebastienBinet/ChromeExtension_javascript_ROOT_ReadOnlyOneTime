@@ -29,43 +29,34 @@ var TEMP_RED_SQUARE_BOX = {
 //var JUMPS_WHEN_FAST_FINDING = Math.floor(MIN_SIZE_FOR_MATCH / 2);
 //var storageLength = -1;
 
+var MIN_PERCENT_ZONE_COVERED_TO_BE_CONSIDERED_AS_READ = 90;
 
-var FullArray; // full array of elements in this page
 
+var maxX = -1;
+var maxY = -1;
 
 function getTimeNow() {
     return  (new Date()).getTime() % 65536;
 
 }
-function autoReschedulingPeriodicGreying() {
-    if(0) console.log("autoReschedulingPeriodicGreying starting");
-    if(0) console.log("1   " + getTimeNow() + "ms");
-//#if 0
-   
-    // get an array of all elements in the page.
-    FullArray = getAllUsefulElements();
-    
-    
-    
-    
-    if(0) console.log("1+  " + getTimeNow() + "ms");
 
-    // get storage text
+
+
+function parseAllPageAndGrey() {
+      // parse all elements and grey them if they are found in storage
+    var i;
+    
+     // get storage text
     var  allTextFromStorage = getAllTextFromStorage();
     var qty = howManyPagesAreCurrentlyOpenedOnThisSite();
     if(0) console.log(" 2  " + getTimeNow() + "ms, nb pages opened=" + qty + ", local storage size=" + allTextFromStorage.length);
-    
-    // parse all elements and grey them if they are found in storage
-    var i;
-//    for (i = 0; i< FullArray.length; i++) {
-        // get text of one element
-//        var element_i = FullArray[i];
-    
+
     // start at top, and parse until the end
     var element_body = $("body")[0];
     var element_i = element_body.children[0];
 
     while (element_i) {
+        
         var next_element = null;
         var text_element_i = element_i.innerText;
         var afterThisElement_stopGoingDown = false;
@@ -78,6 +69,8 @@ function autoReschedulingPeriodicGreying() {
 
             // check if there is enough consecutive characters (in this element and its children tree) to be considered a text element
             if (thereIsUsefulTextInThisTree) {
+//setElementWithBackgroundBlue(element_i);
+//setElementWithBackgroundRed(element_i);
                 // check if the text of this element is not empty and found in the Storage
                 var isTreeAllFound = ((text_element_i.length > 0) && (allTextFromStorage.indexOf(text_element_i) >= 0));
                 // if all text inside this node (includes all children tree) was found in storage
@@ -144,14 +137,213 @@ function autoReschedulingPeriodicGreying() {
                 element_i = next_element;
             }
         } // end if
-        
         if(0) console.log(">>>[" + i + "] = " + element_i + ":" + text_element_i + "<<<");
     } // end while
+}
+
+function isThisElementASurfaceWithANonZeroArea(el) {
+    var isIt = false;
+    var pos = getPosInfo(el);
+    // if there is a zone in this element
+    if (pos.right > 0 && pos.bottom > 0) {
+        var el_width           = pos.right  - pos.left;
+        var el_height          = pos.bottom - pos.top;
+        var el_surface         = el_width * el_height;
+        if (el_surface > 0) {
+            isIt = true;
+        }
+    }
+    return isIt;
+}
+
+function isMostOfThisElementInReadZone(el) {
+    var isIt = false;
+//            var elWidth = el.clientWidth;
+//            var elHeight = el.clientHeight;
+    var pos = getPosInfo(el);
+     //      some sanity check // previously is there is a zone in this element
+    if (pos.right >= 0 && pos.bottom >= 0) {
+        var el_width           = pos.right  - pos.left;
+        var el_height          = pos.bottom - pos.top;
+        var limMaxX            = (maxX < pos.right) ? maxX : pos.right;
+        var el_covered_x       = limMaxX - pos.left;
+            el_covered_x       = (el_covered_x > 0) ? el_covered_x : 0;
+        var limMaxY            = (maxY < pos.bottom) ? maxY : pos.bottom;
+        var el_covered_y       = limMaxY - pos.top;
+            el_covered_y       = (el_covered_y > 0) ? el_covered_y : 0;
+        var el_surface         = el_width * el_height;
+        var el_covered_surface = el_covered_x * el_covered_y;
+            el_covered_surface = (el_covered_surface > 0) ? el_covered_surface : 0;
+        // if there is enough of that zone covered
+        if (el_covered_surface >= MIN_PERCENT_ZONE_COVERED_TO_BE_CONSIDERED_AS_READ/100 * el_surface) {
+            isIt = true;
+        }
+    }
+    return isIt;
+}
+
+
+// parse all elements and put a border around them if they are marked as read
+function checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(el) {
     
-    // prepare for next iteration
+    var retAllInReadZone = true;
+    
+    // check if there are children
+    var firstChild = el.firstElementChild;
+    if (firstChild != null) {
+        // Case there are children
+        // Check if all children in read zone (start with first child)
+        if (checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(firstChild)) {
+            // Case all children are in read zone
+            // Check if this element is also in read zone
+            var thisElIsRead = isMostOfThisElementInReadZone(el);
+            if (thisElIsRead) {
+                // Case this element and all its children are in read zone
+                // check if this element has a surface (non-zero area)
+                if (isThisElementASurfaceWithANonZeroArea(el)) {
+                    // Display it as read
+                    displayAsInReadZone(el);
+                }
+            } else {// else
+                // Case this element in not in read zone
+                // Return "this element is not in read zone"
+                retAllInReadZone = false;
+            }
+        } else { // else of "Check if all children in read zone"
+            // Case not all children are in read zone
+            // Return "this element is not in read zone"
+            retAllInReadZone = false;
+        } // "Check if all children in read zone"
+    } else { // else of "check if there are children"
+        // Case there are not children
+        // Check if most of this element is in the read zone
+        var thisElIsRead = isMostOfThisElementInReadZone(el);
+        if (thisElIsRead) {
+            // Case most of this element is in the read zone
+            // check if this element has a surface (non-zero area)
+            if (isThisElementASurfaceWithANonZeroArea(el)) {
+                // Display it as read
+                displayAsInReadZone(el);
+            }
+        } else {
+            // Case not enough of this element is in the read zone
+            // Return "this element is not in read zone"
+            retAllInReadZone = false;
+        }
+    } // "check if there are children"
+    
+    
+    // if there is a next sibling, process it
+    var nextSiblingToThisEl = el.nextElementSibling;
+    if (nextSiblingToThisEl) {
+        var allSiblingAreInReadZone = checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt (nextSiblingToThisEl);
+        if (! allSiblingAreInReadZone) {
+            // Case not all siblings at this level are in the read zone
+            // Return "not all element are not in read zone"
+            retAllInReadZone = false;
+        }
+    }
+    
+    // at this point, all child are analyzed, and all next siblings are analyzed.
+    return retAllInReadZone;
+}
+    
+function parseAllPAgeAndDisplayReadZone() {
+    var firstUsefulElement = $("body *").not("script")[0];
+    checkIfThisElementAndItsChildrenAreInReadZoneAndDisplayIt(firstUsefulElement);
+    
+//    var i;
+//    
+//    
+//    
+//    
+//    
+//    
+//    // start at lowest possible level, and parse until the end
+//    var element_body = $("body")[0];
+//    
+//    var element_i = walkUntilLastchildre(element_body.children[0];
+//
+//    while (element_i) {
+//        var next_element = null;
+//        var text_element_i = element_i.innerText;
+//        var afterThisElement_stopGoingDown = false;
+//        
+//        if (text_element_i != null) {
+//
+//
+//                    // check that there is long enough text directly in this element
+//                    var thereIsUsefulTextDirectly = false;
+//                    var iiii;
+//                    for (iiii = 0; iiii < element_i.childNodes.length; iiii++) {
+//                        if ((element_i.childNodes[iiii].nodeName === "#text") && (element_i.childNodes[iiii].wholeText.search(/[A-Z]{2,}/i) >= 0)) {
+//                            thereIsUsefulTextDirectly = true;
+//                        }
+//                    }
+//                    // last child if there is no child or if there is 0 child
+//                    var lastChild = (element_i && (!element_i.children || (element_i.children.length === 0)));
+//                    // if found and there are long enough text directly at this level, put it in grey
+//                    if(thereIsUsefulTextDirectly || lastChild) {
+//                        setElementWithRootStyleUsefulTextDirectly(element_i);
+//                        // we do not need to parse children, so try to go to next sibbling
+//                        afterThisElement_stopGoingDown = true;
+//                    } else {
+//                        setElementWithRootStyleUsefulNoTextDirectly(element_i);
+//                    }
+//            
+//            // get the next element to analyze
+//            while (next_element == null ) {
+//                if (afterThisElement_stopGoingDown) {
+//                    // try to go to next at the same level
+//                    if (element_i.nextElementSibling != null) {
+//                        // found at same level
+//                        next_element = element_i.nextElementSibling;
+//                    } else {
+//                        // need to go up
+//                        element_i = element_i.parentElement;
+//                     }
+//                } else {
+//                    // try to go down
+//                    if (element_i.firstElementChild != null) {
+//                        // go down
+//                        next_element = element_i.firstElementChild;
+//                    } else {
+//                        // try to go to next at the same level
+//                        if (element_i.nextElementSibling != null) {
+//                            // found at same level
+//                            next_element = element_i.nextElementSibling;
+//                        } else {
+//                            // need to go up
+//                            element_i = element_i.parentElement;
+//                            afterThisElement_stopGoingDown = true;
+//                        }
+//                    }
+//                } // end else
+//                // if at body level, prepare to exit all
+//                if (element_i == element_body) {
+//                    // came back at body level, so exit all
+//                    next_element = element_body;
+//                    element_i = null;
+//                }
+//            } // end while
+//            // if not preparing to exit, prepare for going back to while check
+//            if (element_i != null) {
+//                // normal situation
+//                element_i = next_element;
+//            }
+//        } // end if
+//        if(0) console.log(">>>[" + i + "] = " + element_i + ":" + text_element_i + "<<<");
+//    } // end while
+   
+}
+
+function autoReschedulingPeriodicGreying() {
+    if(0) console.log("autoReschedulingPeriodicGreying starting");
+    if(0) console.log("1   " + getTimeNow() + "ms");
+    parseAllPAgeAndDisplayReadZone();
+    parseAllPageAndGrey();
     if(0) console.log("  3 " + getTimeNow() + "ms");
     setTimeout(autoReschedulingPeriodicGreying, 100);
-//#endif
 }
 
 //function saveElementToStorage( el ) {
@@ -173,6 +365,9 @@ function saveAllTextFromEveryElementsOfThisPage() {
     var  stringToAdd = "";
 
     if(0) console.log("   4" + getTimeNow() + "ms");
+    
+    // get an array of all elements in the page.
+    var FullArray = getAllUsefulElements();
     
     for (i = 0; i< FullArray.length; i++) {
         // get text of one element
@@ -339,7 +534,9 @@ function setRulesForMarking() {
     $("*").mousemove(function(event){
         var x = event.pageX;
         var y = event.pageY;
-        if (0) console.log("x:" + x + ", y:" + y );
+        maxX = x > maxX ? x : maxX;
+        maxY = y > maxY ? y : maxY;
+        if (1) console.log("x:" + x + ", y:" + y +" maxX:" + maxX + ", maxY:" + maxY );
     });
     
     $(window).unload(function(){

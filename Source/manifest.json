@@ -22,7 +22,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["jquery-1.11.2.js", "DOMmanipulations.js", "storageAccesses.js", "content_script_periodic.js"]
+      "js": ["jquery-1.11.2.js", "element_getPosInfo.js", "DOMmanipulations.js", "storageAccesses.js", "content_script_periodic.js"]
     }
   ],
   "permissions": [
