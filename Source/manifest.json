@@ -3,7 +3,7 @@
 
   "name": "ROOT",
   "description": "ROOT",
-  "version": "1.1.0",
+  "version": "1.1.1",
 
 
   "background": {
@@ -13,12 +13,14 @@
 
 
   "browser_action": {
-    "default_icon": "icon.png",
-    "default_title": "ROOT_v_1.1.0"
+    "default_icon": "icon_19_19_text_only.png",
+    "default_title": "Press here to start fresh for this web site"
   },
-  "icons": { "16": "icon.png",
-           "48": "icon.png",
-          "128": "icon.png" },
+  "icons": { "16": "ROOT_16_16_text_only.png",
+           "32": "ROOT_19_19_text_only.png",
+           "48": "ROOT_48_48.png",
+           "96": "ROOT_96_96.png",
+          "128": "ROOT_128_128_alpha_around_96_96.png" },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
