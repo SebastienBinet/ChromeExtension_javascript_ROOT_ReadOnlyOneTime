@@ -1,5 +1,8 @@
 console.log("Injection background.js - begin");
 
+
+
+
 // Called in background context when extension icon is clicked
 function clickListener(clickInfo){
   var tabId_ = clickInfo.id;

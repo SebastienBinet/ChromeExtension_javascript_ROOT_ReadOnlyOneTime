@@ -7,6 +7,7 @@ function getTimeNow() {
 //var ROOT_HIGHLIGHT = "2px solid rgba(211, 255, 230,0.2)"
 var ROOT_BACKGROUND_COLOR_LAST_CHILD = "rgba(185, 220, 200, 0.9)";
 var ROOT_BACKGROUND_COLOR_NOT_LAST_CHILD = "rgba(255, 200, 200, 0.1)";
+
 //var ROOT_BACKGROUND_COLOR = "rgb(185, 200, 200)"
 //var READ_SQUARE_BOX = "1px 0px 1px 0px dashed red";
 
@@ -37,7 +38,7 @@ var ROOT_BACKGROUND_COLOR_NOT_LAST_CHILD = "rgba(255, 200, 200, 0.1)";
 
 
 function setElementWithRootStyleUsefulTextDirectly( el ) {
-    el.style.backgroundColor = ROOT_BACKGROUND_COLOR_LAST_CHILD;
+    el.style.backgroundColor = currentColorForReadElements;
 //    el.style.borderRadius = "15px";
 }
 

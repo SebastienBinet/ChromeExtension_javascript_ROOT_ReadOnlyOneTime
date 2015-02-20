@@ -3,6 +3,9 @@ if(0) console.log("0   " + getTimeNow() + "ms");
 //console.log("Injection of content_script_periodic.js - started");
 // This script is injected in all pages.
 
+var ROOT_BACKGROUND_COLOR_LAST_CHILD = "rgba(185, 220, 200, 0.9)";
+var currentColorForReadElements = ROOT_BACKGROUND_COLOR_LAST_CHILD;
+
 //var ROOT_HIGHLIGHT = "10px solid rgba(211, 255, 230,0.2)";
 //var REVERT_HIGHLIGHT = "revert";
 //var TEMP_RED_SQUARE = "1px dashed red";
@@ -45,6 +48,11 @@ function getTimeNow() {
 
 
 function parseAllPageAndGrey() {
+    
+    var ROOTconfig = get_ROOT_options();
+    if(1) console.log("Config color is currently: " + ROOTconfig.RootColor);
+    currentColorForReadElements = ROOTconfig.RootColor;
+    
       // parse all elements and grey them if they are found in storage
     var i;
     
@@ -373,7 +381,7 @@ function autoReschedulingPeriodicGreying() {
     parseAllPageAndSaveTextInCurrentReadingZone();
     parseAllPageAndGrey();
     if(0) console.log("  3 " + getTimeNow() + "ms");
-    setTimeout(autoReschedulingPeriodicGreying, 100);
+    setTimeout(autoReschedulingPeriodicGreying, 2000);
 }
 
 //function saveElementToStorage( el ) {

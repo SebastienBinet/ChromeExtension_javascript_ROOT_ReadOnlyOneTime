@@ -4,6 +4,27 @@ function getTimeNow() {
 }
 if(1) console.log("0%  " + getTimeNow() + "ms");
 
+var currentRootConfig = null;
+
+// Obtain the preferences stored in chrome.storage.
+function retrieve_ROOT_options() {
+  chrome.storage.sync.get({
+    RootColor: 'red',
+    RootNbWordMatch: '4',
+    RootGreyMode: 'backgroundSingleSolidColor',
+    RootSelectionMode: 'EveryElementCompletelyAtLeftAndAboceTheCurrentMousePositionInWhleDocument',
+    RootVisualFeedback: 'none'
+  }, function(items) {
+      currentRootConfig = items;
+      if(1) console.log("Config color is currently: " + currentRootConfig.RootColor);
+  });
+}
+
+function get_ROOT_options() {
+    retrieve_ROOT_options();
+    return currentRootConfig;
+}
+
 function getAllTextFromStorage() {
     
     var currentLocaleStorageText = "";

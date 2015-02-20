@@ -3,9 +3,17 @@
 
   "name": "ROOT",
   "description": "ROOT",
-  "version": "1.1.1",
-
-
+  "version": "1.1.2",
+//  "options_page": "options.html",
+  "options_ui": {
+    // Required.
+    "page": "options.html",
+    // Recommended.
+    "chrome_style": true
+    // Not recommended; only provided for backwards compatibility,
+    // and will be unsupported in a future version of Chrome (TBD).
+    //"open_in_tab": true
+  },
   "background": {
     "scripts": ["background.js"],
     "persistent": false
@@ -13,7 +21,8 @@
 
 
   "browser_action": {
-    "default_icon": "icon_19_19_text_only.png",
+    "default_icon": "ROOT_19_19_text_only.png",
+    "default_popup": "popup.html",
     "default_title": "Press here to start fresh for this web site"
   },
   "icons": { "16": "ROOT_16_16_text_only.png",
@@ -28,6 +37,6 @@
     }
   ],
   "permissions": [
-    "tabs", "activeTab", "http://*/*.hostname", "http://*/", "http://*/*", "https://*/*.hostname", "https://*/*" 
+    "storage", "tabs", "activeTab", "http://*/*.hostname", "http://*/", "http://*/*", "https://*/*.hostname", "https://*/*" 
   ]
 }
