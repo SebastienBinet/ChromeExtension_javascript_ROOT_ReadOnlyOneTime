@@ -3,7 +3,7 @@ if(0) console.log("0   " + getTimeNow() + "ms");
 //console.log("Injection of content_script_periodic.js - started");
 // This script is injected in all pages.
 
-var ROOT_PERIOD_MS = 1000;
+var ROOT_PERIOD_MS = 200;
 var ROOT_BACKGROUND_COLOR_LAST_CHILD = "rgba(185, 220, 200, 0.9)";
 var currentColorForReadElements = ROOT_BACKGROUND_COLOR_LAST_CHILD;
 
@@ -51,8 +51,12 @@ function getTimeNow() {
 function parseAllPageAndGrey() {
     
     var ROOTconfig = get_ROOT_options();
-    if(1) console.log("Config color is currently : " + ROOTconfig.RootColor);
-    currentColorForReadElements = ROOTconfig.RootColor;
+    if (ROOTconfig != null) {
+        if(1) console.log("Config color is currently : " + ROOTconfig.RootColor);
+        currentColorForReadElements = ROOTconfig.RootColor;        
+    } else {
+        if(1) console.log("Config color is currently undefined (not got yet from the storage) ");
+    }
     
       // parse all elements and grey them if they are found in storage
     var i;
@@ -80,6 +84,10 @@ function parseAllPageAndGrey() {
 
             // check if there is enough consecutive characters (in this element and its children tree) to be considered a text element
             if (thereIsUsefulTextInThisTree) {
+                
+                // compute how many words there is in match
+                //var nbWords = 
+                
 //setElementWithBackgroundBlue(element_i);
 //setElementWithBackgroundRed(element_i);
                 // check if the text of this element is not empty and found in the Storage

@@ -32,9 +32,9 @@ function clickListenerPopupIcon(clickInfo){
 
 // Obtain the preferences stored in chrome.storage.
 function display_options() {
-  // Use default value color = 'red'.
+ // Use default value color in case the storage is not accessible.
   chrome.storage.sync.get({
-    RootColor: 'red',
+    RootColor: 'grey',
     RootNbWordMatch: '4',
     RootGreyMode: 'backgroundSingleSolidColor',
     RootSelectionMode: 'EveryElementCompletelyAtLeftAndAboceTheCurrentMousePositionInWhleDocument',
