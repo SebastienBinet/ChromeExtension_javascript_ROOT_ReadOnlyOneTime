@@ -3,10 +3,11 @@ if(0) console.log("0   " + getTimeNow() + "ms");
 //console.log("Injection of content_script_periodic.js - started");
 // This script is injected in all pages.
 
-var ROOT_PERIOD_MS = 2000;
+var ROOT_PERIOD_MS = 200;
 var ROOT_BACKGROUND_COLOR_LAST_CHILD = "rgba(185, 220, 200, 0.9)";
 var currentRootColorForReadElements ; //= ROOT_BACKGROUND_COLOR_LAST_CHILD;
 var currentRootGreyModeForReadElements ; //= 'Background Single Solid Color';
+var ROOTconfig = get_ROOT_options();
 
 //var ROOT_HIGHLIGHT = "10px solid rgba(211, 255, 230,0.2)";
 //var REVERT_HIGHLIGHT = "revert";
@@ -52,7 +53,7 @@ function getTimeNow() {
 
 function parseAllPageAndGrey() {
     
-    var ROOTconfig = get_ROOT_options();
+    ROOTconfig = get_ROOT_options();
     if (ROOTconfig != null) {
         if(0) console.log("Config color is currently : " + ROOTconfig.RootColor);
         currentRootColorForReadElements = ROOTconfig.RootColor;     
@@ -178,7 +179,35 @@ function isThisElementASurfaceWithANonZeroArea(el) {
     return isIt;
 }
 
-function isMostOfThisElementInReadZone(el) {
+
+
+
+function isThisElementConsideredAsInReadZone(el) {
+    var isIt = false;
+   
+    // The check to mark is configurable
+    if (ROOTconfig && ROOTconfig.RootSelectionMode) {
+        if (ROOTconfig.RootSelectionMode.indexOf("Every Element Completely At Left And Above The Current Mouse Position In The whole Document") >= 0) {
+            isIt = isMostOfThisElementLeftAndAboveCurrentMousePosition(el);
+        } else if (ROOTconfig.RootSelectionMode.indexOf("Top is invisible and bottom is very high in screen") >= 0) {
+            isIt = isMostOfThisElementAboveCurrentView(el);
+        }
+    }
+    return isIt;
+}
+
+function isMostOfThisElementAboveCurrentView(el) {
+    var isIt = false;
+    var pos = getPosInfo(el);
+    var topOfVisibleZoneY = window.pageYOffset;
+    if(0) console.log("element bottom:" + pos.bottom + "window page y offset:" + topOfVisibleZoneY + "mouse y:" + currY);
+    if (pos.bottom < topOfVisibleZoneY + 75) {
+        isIt = true;
+    }
+    return isIt;
+}
+    
+function isMostOfThisElementLeftAndAboveCurrentMousePosition(el) {
     var isIt = false;
 //            var elWidth = el.clientWidth;
 //            var elHeight = el.clientHeight;
@@ -287,7 +316,7 @@ function checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(e
         if (ret001.isThisElInCurrentReadZone) {
             // Case all children are in read zone
             // Check if this element is also in read zone
-            var thisElIsRead = isMostOfThisElementInReadZone(el);
+            var thisElIsRead = isThisElementConsideredAsInReadZone(el);
             if (thisElIsRead) {
                 // Case this element and all its children are in read zone
                 // check if this element has a surface (non-zero area)
@@ -322,7 +351,7 @@ function checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(e
     } else { // else of "check if there are children"
         // Case there are not children
         // Check if most of this element is in the read zone
-        var thisElIsRead = isMostOfThisElementInReadZone(el);
+        var thisElIsRead = isThisElementConsideredAsInReadZone(el);
         if (thisElIsRead) {
             // Case most of this element is in the read zone
             // check if this element has a surface (non-zero area)
@@ -592,7 +621,7 @@ function setRulesForMarking() {
         currY = event.pageY;
         maxX = currX > maxX ? currX : maxX;
         maxY = currY > maxY ? currY : maxY;
-        if (1) console.log("x:" + currX + ", y:" + currY +" maxX:" + maxX + ", maxY:" + maxY );
+        if (0) console.log("x:" + currX + ", y:" + currY +" maxX:" + maxX + ", maxY:" + maxY );
     });
     
     $(window).unload(function(){
