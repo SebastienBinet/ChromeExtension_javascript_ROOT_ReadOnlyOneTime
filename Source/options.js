@@ -44,9 +44,9 @@ function restore_options() {
   // Use default value color in case the storage is not accessible.
   chrome.storage.sync.get({
     likesColor: true,
-    RootColor: 'grey',
+    RootColor: 'silver',
     RootNbWordMatch: '4',
-    RootGreyMode: 'background single solid color',
+    RootGreyMode: 'Background Single Solid Color',
     RootSelectionMode: 'Every Element Completely At Left And Above The Current Mouse Position In The Document',
     RootVisualFeedback: 'none'
  }, function(items) {
@@ -66,7 +66,7 @@ function read_current_options() {
     likesColor: true,
     RootColor: 'grey',
     RootNbWordMatch: '4',
-    RootGreyMode: 'background single solid color',
+    RootGreyMode: 'Background Single Solid Color',
     RootSelectionMode: 'Every Element Completely At Left And Above The Current Mouse Position In The Document',
     RootVisualFeedback: 'none'
  }, function(items) {
@@ -83,13 +83,21 @@ document.getElementById('save').addEventListener('click',
 var i_i=0;
 function autoReschedulingPeriodic() {
     read_current_options();
+    
+    // current
     var elForValueFromStorage = document.getElementById('RootColorIdFromStorage');
-    if ((elForValueFromStorage != null) && (currentConfigFromStorage != null)) {
-        elForValueFromStorage.style.backgroundColor = currentConfigFromStorage.RootColor;
-    }
+    setElementWithRootStyleUsefulTextDirectly(elForValueFromStorage, currentConfigFromStorage);
+//    if ((elForValueFromStorage != null) && (currentConfigFromStorage != null)) {
+//        elForValueFromStorage.style.backgroundColor = currentConfigFromStorage.RootColor;      //marche
+//    }
+//    
+//    //new
     var elForNewValue = document.getElementById('RootColorIdNew');
+    var newMode = document.getElementById('RootGreyModeId').value;
+    var newColor = document.getElementById('RootColorId').value;
+    setElementWithThisStyle(elForNewValue, newMode, newColor);
     if (elForNewValue != null) {
-        elForNewValue.style.backgroundColor = document.getElementById('RootColorId').value;
+//        elForNewValue.style.backgroundColor = document.getElementById('RootColorId').value;
         elForNewValue.textContent = "new" + i_i++;
     }
     setTimeout(autoReschedulingPeriodic, OPTIONS_PERIOD_MS);

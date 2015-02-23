@@ -36,8 +36,8 @@ function display_options() {
   chrome.storage.sync.get({
     RootColor: 'grey',
     RootNbWordMatch: '4',
-    RootGreyMode: 'backgroundSingleSolidColor',
-    RootSelectionMode: 'EveryElementCompletelyAtLeftAndAboceTheCurrentMousePositionInWhleDocument',
+    RootGreyMode: 'Background Single Solid Color',
+    RootSelectionMode: 'Every Element Completely At Left And Above The Current Mouse Position In The whole Document',
     RootVisualFeedback: 'none'
   }, function(items) {
     document.getElementById('RootColor').textContent = items.RootColor;

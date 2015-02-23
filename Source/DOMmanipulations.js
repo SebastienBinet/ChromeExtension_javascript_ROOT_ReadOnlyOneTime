@@ -37,9 +37,28 @@ var ROOT_BACKGROUND_COLOR_NOT_LAST_CHILD = "rgba(255, 200, 200, 0.1)";
 //}
 
 
-function setElementWithRootStyleUsefulTextDirectly( el ) {
-    el.style.backgroundColor = currentColorForReadElements;
+function setElementWithThisStyle( el, mode, color ) {
+    
+    if (el != null &&  mode != null && color != null) {
+        el.style.backgroundColor = "initial";
+        el.style.color = "initial";
+
+        if (mode.indexOf("Background Single Solid Color") >= 0) {
+            el.style.backgroundColor = color;
+        } else if(mode.indexOf("Overlay Box Alpha With Actual Background Color") >= 0) {
+        } else if(mode.indexOf("Font Solid Color") >= 0) {
+            el.style.color = color;
+        }
+    }
 //    el.style.borderRadius = "15px";
+}
+
+
+function setElementWithRootStyleUsefulTextDirectly( el, config ) {
+    if ((el != null) && (config != null)) {
+    setElementWithThisStyle (el, config.RootGreyMode, config.RootColor); // old bad:  currentRootGreyModeForReadElements, currentRootColorForReadElements);
+//        el.style.backgroundColor = config.RootColor;
+    }
 }
 
 function setElementWithBackgroundBlue( el ) {

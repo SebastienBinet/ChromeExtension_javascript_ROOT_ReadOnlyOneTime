@@ -11,12 +11,12 @@ function retrieve_ROOT_options() {
   chrome.storage.sync.get({
     RootColor: 'red',
     RootNbWordMatch: '4',
-    RootGreyMode: 'backgroundSingleSolidColor',
-    RootSelectionMode: 'EveryElementCompletelyAtLeftAndAboceTheCurrentMousePositionInWhleDocument',
+    RootGreyMode: 'Background Single Solid Color',
+    RootSelectionMode: 'Every Element Completely At Left And Above The Current Mouse Position In The whole Document',
     RootVisualFeedback: 'none'
   }, function(items) {
       currentRootConfig = items;
-      if(1) console.log("Config color is currently: " + currentRootConfig.RootColor);
+      if(0) console.log("Config color is currently: " + currentRootConfig.RootColor);
   });
 }
 

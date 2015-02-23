@@ -8,6 +8,7 @@
 ROOT color for text already read:
 <!--<div><input class="color" name="bgColor" style="position:absolute; top:10px; right:10px" onchange="updateBackground(this.color.toString())" value="666666" /></div>-->
 <select id="RootColorId">
+ <option value="WhiteSmoke">WhiteSmoke</option>
  <option value="rgba(185, 220, 200, 0.9)">ROOT 1: rgba(185, 220, 200, 0.9)</option>
  <option value="rgba(240, 240, 240, 0.9)">ROOT 2: rgba(240, 240, 240, 0.9)</option>
  <option value="rgba(200, 230, 230, 0.9)">ROOT 3: rgba(200, 230, 230, 0.9)</option>
@@ -35,16 +36,16 @@ Minimum number of words in a match:
 <br>
 Minimum number of words in a match:
 <select id="RootGreyModeId">
- <option value="background single solid color"> background solid</option>
+ <option value="Background Single Solid Color"> background solid</option>
  <option value="Overlay Box Alpha With Actual Background Color">TBD:2</option>
- <option value="TBD: 3">TBD:3</option>
+ <option value="Font Solid Color">Font Solid Color</option>
  <option value="TBD: 4">TBD:4</option>
 </select>
 <br>
 Minimum number of words in a match:
 <select id="RootSelectionModeId">
  <option value="Every Element Completely At Left And Above The Current Mouse Position In The Document">all text at left of mouse</option>
- <option value="TBD: longTimeOnText">TBD: longTimeOnText</option>
+ <option value="TBD: long Time On Text">TBD: longTimeOnText</option>
  <option value="TBD: increase-Decrease-and-threshold">TBD: increase-Decrease-and-threshold</option>
  <option value="TBD: top is invisible and bottom is very high in screen">TBD: top is invisible and bottom is very high in screen</option>
  <option value="TBD: slide in / slide out">TBD: slide in / slide out</option>
@@ -67,6 +68,7 @@ Visual Feedback for the current text under selection:
 <div id="status"></div>
 <button id="save">Save</button>
 
+<script src="DOMmanipulations.js"></script>
 <script src="options.js"></script>
 </body>
 </html>

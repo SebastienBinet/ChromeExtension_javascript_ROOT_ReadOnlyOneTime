@@ -4,7 +4,8 @@
   "name": "ROOT",
   "description": "ROOT",
   "version": "1.1.2",
-//  "options_page": "options.html",
+
+    
   "options_ui": {
     // Required.
     "page": "options.html",
@@ -14,6 +15,8 @@
     // and will be unsupported in a future version of Chrome (TBD).
     //"open_in_tab": true
   },
+
+    
   "background": {
     "scripts": ["background.js"],
     "persistent": false
@@ -22,7 +25,7 @@
 
   "browser_action": {
     "default_icon": "ROOT_19_19_text_only.png",
-    "default_popup": "popup.html",
+//    "default_popup": "popup.html",
     "default_title": "Press here to start fresh for this web site"
   },
   "icons": { "16": "ROOT_16_16_text_only.png",

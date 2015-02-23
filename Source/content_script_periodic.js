@@ -3,9 +3,10 @@ if(0) console.log("0   " + getTimeNow() + "ms");
 //console.log("Injection of content_script_periodic.js - started");
 // This script is injected in all pages.
 
-var ROOT_PERIOD_MS = 200;
+var ROOT_PERIOD_MS = 2000;
 var ROOT_BACKGROUND_COLOR_LAST_CHILD = "rgba(185, 220, 200, 0.9)";
-var currentColorForReadElements = ROOT_BACKGROUND_COLOR_LAST_CHILD;
+var currentRootColorForReadElements ; //= ROOT_BACKGROUND_COLOR_LAST_CHILD;
+var currentRootGreyModeForReadElements ; //= 'Background Single Solid Color';
 
 //var ROOT_HIGHLIGHT = "10px solid rgba(211, 255, 230,0.2)";
 //var REVERT_HIGHLIGHT = "revert";
@@ -26,6 +27,7 @@ var currentColorForReadElements = ROOT_BACKGROUND_COLOR_LAST_CHILD;
 //    "border-left-width": "5px",
 //    "border-right-width": "5px"
 //    };
+
 
 
 
@@ -52,8 +54,9 @@ function parseAllPageAndGrey() {
     
     var ROOTconfig = get_ROOT_options();
     if (ROOTconfig != null) {
-        if(1) console.log("Config color is currently : " + ROOTconfig.RootColor);
-        currentColorForReadElements = ROOTconfig.RootColor;        
+        if(0) console.log("Config color is currently : " + ROOTconfig.RootColor);
+        currentRootColorForReadElements = ROOTconfig.RootColor;     
+        currentRootGreyModeForReadElements = ROOTconfig.RootGreyMode;
     } else {
         if(1) console.log("Config color is currently undefined (not got yet from the storage) ");
     }
@@ -106,7 +109,7 @@ function parseAllPageAndGrey() {
                     var lastChild = (element_i && (!element_i.children || (element_i.children.length === 0)));
                     // if found and there are long enough text directly at this level, put it in grey
                     if(thereIsUsefulTextDirectly || lastChild) {
-                        setElementWithRootStyleUsefulTextDirectly(element_i);
+                        setElementWithRootStyleUsefulTextDirectly(element_i, ROOTconfig);
                         // we do not need to parse children, so try to go to next sibbling
                         afterThisElement_stopGoingDown = true;
                     } else {
@@ -385,11 +388,11 @@ function parseAllPageAndSaveTextInCurrentReadingZone() {
 
 function autoReschedulingPeriodicGreying() {
     if(0) console.log("autoReschedulingPeriodicGreying starting");
-    if(0) console.log("1   " + getTimeNow() + "ms");
+    if(1) console.log("1   " + getTimeNow() + "ms");
 //    parseAllPAgeAndDisplayReadZone();
     parseAllPageAndSaveTextInCurrentReadingZone();
     parseAllPageAndGrey();
-    if(0) console.log("  3 " + getTimeNow() + "ms");
+    if(1) console.log("  3 " + getTimeNow() + "ms");
     setTimeout(autoReschedulingPeriodicGreying, ROOT_PERIOD_MS);
 }
 
