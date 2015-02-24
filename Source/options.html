@@ -8,7 +8,11 @@
 ROOT color for text already read:
 <!--<div><input class="color" name="bgColor" style="position:absolute; top:10px; right:10px" onchange="updateBackground(this.color.toString())" value="666666" /></div>-->
 <select id="RootColorId">
+ <option value="yellow">yellow</option>
  <option value="WhiteSmoke">WhiteSmoke</option>
+ <option value="red">red</option>
+ <option value="green">green</option>
+ <option value="blue">blue</option>
  <option value="rgba(185, 220, 200, 0.9)">ROOT 1: rgba(185, 220, 200, 0.9)</option>
  <option value="rgba(240, 240, 240, 0.9)">ROOT 2: rgba(240, 240, 240, 0.9)</option>
  <option value="rgba(200, 230, 230, 0.9)">ROOT 3: rgba(200, 230, 230, 0.9)</option>
@@ -17,32 +21,38 @@ ROOT color for text already read:
  <option value="rgba(200, 200, 230, 0.9)">ROOT 6: rgba(200, 200, 230, 0.9)</option>
  <option value="rgba(230, 200, 200, 0.9)">ROOT 7: rgba(230, 200, 200, 0.9)</option>
  <option value="rgba(200, 230, 200, 0.9)">ROOT 8: rgba(200, 230, 200, 0.9)</option>
- <option value="red">red</option>
- <option value="green">green</option>
- <option value="blue">blue</option>
- <option value="yellow">yellow</option>
-</select>
+ </select>
 <span id="RootColorIdFromStorage">current</span>
 &nbsp;
 <span id="RootColorIdNew">new</span>
-<br>
+<br><br>
 Minimum number of words in a match:
 <select id="RootNbWordMatchId">
  <option value="1">1</option>
- <option value="2">2-</option>
+ <option value="2">2</option>
  <option value="3">3</option>
  <option value="4">4</option>
+ <option value="5">5</option>
+ <option value="6">6</option>
+ <option value="8">8</option>
+ <option value="10">10</option>
+ <option value="15">15</option>
+ <option value="25">25</option>
+ <option value="50">50</option>
+ <option value="75">75</option>
+ <option value="100">100</option>
+ <option value="200">200</option>
 </select>
-<br>
-Minimum number of words in a match:
+<br><br>
+Display mode:
 <select id="RootGreyModeId">
+ <option value="Font Solid Color">Font Solid Color</option>
  <option value="Background Single Solid Color"> background solid</option>
  <option value="Overlay Box Alpha With Actual Background Color">TBD:2</option>
- <option value="Font Solid Color">Font Solid Color</option>
  <option value="TBD: 4">TBD:4</option>
 </select>
-<br>
-Minimum number of words in a match:
+<br><br>
+Criteria to use when deciding which text is just read:
 <select id="RootSelectionModeId">
  <option value="Top is invisible and bottom is very high in screen">Top is invisible and bottom is very high in screen</option>
  <option value="Every Element Completely At Left And Above The Current Mouse Position In The Whole Document">all text at left of mouse</option>
@@ -50,7 +60,7 @@ Minimum number of words in a match:
  <option value="TBD: increase-Decrease-and-threshold">TBD: increase-Decrease-and-threshold</option>
  <option value="TBD: slide in / slide out">TBD: slide in / slide out</option>
 </select>
-<br>
+<br><br>
 Visual Feedback for the current text under selection:
 <select id="RootVisualFeedbackId">
  <option value="none">none</option>
@@ -58,7 +68,7 @@ Visual Feedback for the current text under selection:
  <option value="TBD: box shown when the text is select">TBD: box shown when the text is select</option>
  <option value="TBD: 4">TBD: 4</option>
 </select>
-<br>
+<br><br>
      
 <label>
   <input type="checkbox" id="likeId">

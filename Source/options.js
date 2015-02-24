@@ -1,13 +1,4 @@
-//function updateBackground(color) {
-//	document.getElementsByTagName('body')[0].style.backgroundColor = '#'+color
-//    document.getElementById('RootColorId').value = "yellow";
-//}
-//var color1='009687', color2='191C26'
-//
-//function updateGradient() {
-//	document.getElementById('gradient').style.background =
-//		"url('gradient/x"+color1.toUpperCase()+"-378-"+color2.toUpperCase()+".png?tmp') center top repeat-x"
-//}
+
 
 var OPTIONS_PERIOD_MS = 200;
 var currentConfigFromStorage = null;
@@ -33,7 +24,7 @@ function save_options() {
     status.textContent = 'Options saved.';
     setTimeout(function() {
       status.textContent = '';
-    }, 750);
+    }, 250);
   });
 //    document.getElementsByTagName('body').style.backgroundColor = RootColor;
 }
@@ -46,7 +37,7 @@ function restore_options() {
     likesColor: true,
     RootColor: 'yellow',
     RootNbWordMatch: '4',
-    RootGreyMode: 'Background Single Solid Color',
+    RootGreyMode: 'Font Solid Color',
     RootSelectionMode: 'Top is invisible and bottom is very high in screen',
     RootVisualFeedback: 'none'
  }, function(items) {
@@ -66,7 +57,7 @@ function read_current_options() {
     likesColor: true,
     RootColor: 'yellow',
     RootNbWordMatch: '4',
-    RootGreyMode: 'Background Single Solid Color',
+    RootGreyMode: 'Font Solid Color',
     RootSelectionMode: 'Top is invisible and bottom is very high in screen',
     RootVisualFeedback: 'none'
  }, function(items) {

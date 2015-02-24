@@ -34,10 +34,10 @@ function clickListenerPopupIcon(clickInfo){
 function display_options() {
  // Use default value color in case the storage is not accessible.
   chrome.storage.sync.get({
-    RootColor: 'grey',
+    RootColor: 'yellow',
     RootNbWordMatch: '4',
-    RootGreyMode: 'Background Single Solid Color',
-    RootSelectionMode: 'Every Element Completely At Left And Above The Current Mouse Position In The whole Document',
+    RootGreyMode: 'Font Solid Color',
+    RootSelectionMode: 'Top is invisible and bottom is very high in screen',
     RootVisualFeedback: 'none'
   }, function(items) {
     document.getElementById('RootColor').textContent = items.RootColor;

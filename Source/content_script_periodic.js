@@ -8,6 +8,7 @@ var ROOT_BACKGROUND_COLOR_LAST_CHILD = "rgba(185, 220, 200, 0.9)";
 var currentRootColorForReadElements ; //= ROOT_BACKGROUND_COLOR_LAST_CHILD;
 var currentRootGreyModeForReadElements ; //= 'Background Single Solid Color';
 var currentRootSelectionModeId;
+var currentRootNbWordMatchId;
 var ROOTconfig = get_ROOT_options();
 
 //var ROOT_HIGHLIGHT = "10px solid rgba(211, 255, 230,0.2)";
@@ -81,7 +82,7 @@ function isThereEnoughValidTextInThisElement(el) {
 
         if (spacesArray != null) {
             var nbWords = spacesArray.length + 1;
-            areBasicSentenceCriteriaMet = thereIsUsefulTextInThisTree && nbWords > 3;
+            areBasicSentenceCriteriaMet = thereIsUsefulTextInThisTree && nbWords > currentRootNbWordMatchId;
         }
     }
     return areBasicSentenceCriteriaMet;
@@ -108,6 +109,7 @@ function parseAllPageAndGrey() {
         currentRootColorForReadElements = ROOTconfig.RootColor;     
         currentRootGreyModeForReadElements = ROOTconfig.RootGreyMode;
         currentRootSelectionModeId = ROOTconfig.RootSelectionMode;
+        currentRootNbWordMatchId = ROOTconfig.RootNbWordMatch;
     } else {
         if(1) console.log("Config color is currently undefined (not got yet from the storage) ");
     }
@@ -130,7 +132,11 @@ function parseAllPageAndGrey() {
         var text_element_i = element_i.innerText;
         var afterThisElement_stopGoingDown = false;
         
+        // first reset style for this el
+        resetElementStyle(element_i);
+            
         if (text_element_i != null) {
+            
             // check that there is text in this element or in its children.
             var areBasicSentenceCriteriaMet = isThereEnoughValidTextInThisElement(element_i);
 

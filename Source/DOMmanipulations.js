@@ -44,11 +44,20 @@ function getAllUsefulElements() { // all the body, except the scripts
     return x;
 }
 
+
+function resetElementStyle( el ) {
+    
+    if (el != null ) {
+        el.style.backgroundColor = "initial";
+        el.style.color = "initial";
+    }
+//    el.style.borderRadius = "15px";
+}
+
 function setElementWithThisStyle( el, mode, color ) {
     
     if (el != null &&  mode != null && color != null) {
-        el.style.backgroundColor = "initial";
-        el.style.color = "initial";
+        //>>>>>>>>>>>>>>>>>>resetElementStyle( el );
 
         if (mode.indexOf("Background Single Solid Color") >= 0) {
             el.style.backgroundColor = color;
