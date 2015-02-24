@@ -53,12 +53,6 @@ var exampleOfOneMatchInfo = {
     endPos : -1
 };
     
-// get all elements in page that are important
-function getAllUsefulElements() { // all the body, except the scripts 
-    var x = $("body *").not("script").toArray();
-    
-    return x;
-}
 
 function greyAllElements() {
     // works: log (1 seule fois) tout le text qu'il y a d'affiché

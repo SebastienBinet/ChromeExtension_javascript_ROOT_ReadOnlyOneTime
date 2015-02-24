@@ -7,6 +7,7 @@ var ROOT_PERIOD_MS = 200;
 var ROOT_BACKGROUND_COLOR_LAST_CHILD = "rgba(185, 220, 200, 0.9)";
 var currentRootColorForReadElements ; //= ROOT_BACKGROUND_COLOR_LAST_CHILD;
 var currentRootGreyModeForReadElements ; //= 'Background Single Solid Color';
+var currentRootSelectionModeId;
 var ROOTconfig = get_ROOT_options();
 
 //var ROOT_HIGHLIGHT = "10px solid rgba(211, 255, 230,0.2)";
@@ -43,12 +44,60 @@ var maxX  = -1;
 var maxY  = -1;
 var currX = -1;
 var currY = -1;
+var previousCurrX = -1;
+var previousCurrY = -1;
+var currWinPosX = -1;
+var currWinPosY = -1;
+var previousCurrWinPosX = -1;
+var previousCurrWinPosY = -1;
+
 
 function getTimeNow() {
     return  (new Date()).getTime() % 65536;
 
 }
 
+
+function removeDotDotDots(textIn) {
+    var temp1 = textIn;
+    var temp2 = temp1.replace(/\.{3,}/, "");
+    while (temp2.length < temp1.length) {
+        temp1 = temp2;
+        // execute this block if still able to remove dots 
+        temp2 = temp1.replace(/\.{3,}/, "");
+    };
+    return temp2;
+}
+
+
+// check that there is enough text in this element or in its children.
+function isThereEnoughValidTextInThisElement(el) {
+    var areBasicSentenceCriteriaMet = false;
+    var elHasText = el.innerText != null;
+    if (elHasText) {
+        var positionOfLongAlphabeticStringInTree = el.innerText.search(/[A-Z]{2,}/i);
+        var thereIsUsefulTextInThisTree = positionOfLongAlphabeticStringInTree >= 0;
+        var spacesArray = el.innerText.match(/\s+/g);
+
+        if (spacesArray != null) {
+            var nbWords = spacesArray.length + 1;
+            areBasicSentenceCriteriaMet = thereIsUsefulTextInThisTree && nbWords > 3;
+        }
+    }
+    return areBasicSentenceCriteriaMet;
+}
+
+// check that there is text directly in this element.
+function isThereValidTextDirectlyInThisElement(el) {
+    var thereIsUsefulTextDirectly = false;
+    var iiii;
+    for (iiii = 0; iiii < el.childNodes.length; iiii++) {
+        if ((el.childNodes[iiii].nodeName === "#text") && (el.childNodes[iiii].wholeText.search(/[A-Z]{2,}/i) >= 0)) {
+            thereIsUsefulTextDirectly = true;
+        }
+    }
+    return thereIsUsefulTextDirectly;
+}
 
 
 function parseAllPageAndGrey() {
@@ -58,6 +107,7 @@ function parseAllPageAndGrey() {
         if(0) console.log("Config color is currently : " + ROOTconfig.RootColor);
         currentRootColorForReadElements = ROOTconfig.RootColor;     
         currentRootGreyModeForReadElements = ROOTconfig.RootGreyMode;
+        currentRootSelectionModeId = ROOTconfig.RootSelectionMode;
     } else {
         if(1) console.log("Config color is currently undefined (not got yet from the storage) ");
     }
@@ -81,31 +131,21 @@ function parseAllPageAndGrey() {
         var afterThisElement_stopGoingDown = false;
         
         if (text_element_i != null) {
-            // check that there is text in this element or in its children
-            var positionOfLongAlphabeticStringInTree = text_element_i.search(/[A-Z]{2,}/i);
-            var thereIsUsefulTextInThisTree = positionOfLongAlphabeticStringInTree >= 0;
+            // check that there is text in this element or in its children.
+            var areBasicSentenceCriteriaMet = isThereEnoughValidTextInThisElement(element_i);
 
-
-            // check if there is enough consecutive characters (in this element and its children tree) to be considered a text element
-            if (thereIsUsefulTextInThisTree) {
+            // If the basic sentence criterias are met
+            if (areBasicSentenceCriteriaMet) {
                 
-                // compute how many words there is in match
-                //var nbWords = 
-                
-//setElementWithBackgroundBlue(element_i);
-//setElementWithBackgroundRed(element_i);
+                // remove "..." when checking for match
+                text_element_i = removeDotDotDots(text_element_i);
+                 
                 // check if the text of this element is not empty and found in the Storage
                 var isTreeAllFound = ((text_element_i.length > 0) && (allTextFromStorage.indexOf(text_element_i) >= 0));
                 // if all text inside this node (includes all children tree) was found in storage
                 if (isTreeAllFound) {
                     // check that there is long enough text directly in this element
-                    var thereIsUsefulTextDirectly = false;
-                    var iiii;
-                    for (iiii = 0; iiii < element_i.childNodes.length; iiii++) {
-                        if ((element_i.childNodes[iiii].nodeName === "#text") && (element_i.childNodes[iiii].wholeText.search(/[A-Z]{2,}/i) >= 0)) {
-                            thereIsUsefulTextDirectly = true;
-                        }
-                    }
+                    var thereIsUsefulTextDirectly = isThereValidTextDirectlyInThisElement(element_i);
                     // last child if there is no child or if there is 0 child
                     var lastChild = (element_i && (!element_i.children || (element_i.children.length === 0)));
                     // if found and there are long enough text directly at this level, put it in grey
@@ -189,24 +229,37 @@ function isThisElementConsideredAsInReadZone(el) {
     if (ROOTconfig && ROOTconfig.RootSelectionMode) {
         if (ROOTconfig.RootSelectionMode.indexOf("Every Element Completely At Left And Above The Current Mouse Position In The whole Document") >= 0) {
             isIt = isMostOfThisElementLeftAndAboveCurrentMousePosition(el);
-        } else if (ROOTconfig.RootSelectionMode.indexOf("Top is invisible and bottom is very high in screen") >= 0) {
-            isIt = isMostOfThisElementAboveCurrentView(el);
+        } else {
+            if(1) console.log("ERROR 543522, should never get here, because this function is useful only when in this making mode")
         }
     }
     return isIt;
 }
 
-function isMostOfThisElementAboveCurrentView(el) {
+function isElementBeingShiftedOut(el) {
     var isIt = false;
     var pos = getPosInfo(el);
-    var topOfVisibleZoneY = window.pageYOffset;
-    if(0) console.log("element bottom:" + pos.bottom + "window page y offset:" + topOfVisibleZoneY + "mouse y:" + currY);
-    if (pos.bottom < topOfVisibleZoneY + 75) {
+    if(0) console.log("element bottom:" + pos.bottom + "window page y offset:" + currWinPosY + "mouse y:" + currY);
+    var elIsSplitByTopOfWindow = pos.top < currWinPosY && pos.bottom > currWinPosY;
+    var elBottomIsNearTheTop = pos.bottom < currWinPosY + 75;
+    var userIsScrollingDown = currWinPosY > previousCurrWinPosY;
+//    if (userIsScrollingDown) {
+//        console.log("scolling down");
+//    }
+//    if ((pos.bottom < currWinPosY + 75) && (pos.bottom >= currWinPosY) && userIsScrollingDown) {
+    if ( elIsSplitByTopOfWindow && elBottomIsNearTheTop && userIsScrollingDown) {
         isIt = true;
     }
     return isIt;
 }
-    
+
+function isCursorVerticallyInsideThisElementArea(el) {
+    var pos = getPosInfo(el);
+    var isIt = (pos.left <= currX) && (pos.right >= currX); 
+    return isIt;
+}
+
+
 function isMostOfThisElementLeftAndAboveCurrentMousePosition(el) {
     var isIt = false;
 //            var elWidth = el.clientWidth;
@@ -405,12 +458,43 @@ function checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(e
 
 
 function parseAllPageAndSaveTextInCurrentReadingZone() {
-    var firstUsefulElement = $("body *").not("script")[0];
-    // sanity check
-    if (firstUsefulElement != null) {
-        var currentTextInStorage = getAllTextFromStorage();
-        var ret003 = checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(firstUsefulElement, currentTextInStorage);
-        var textToPutInStorage = ret003.newText;
+        
+        
+ var textToPutInStorage;
+ if (ROOTconfig && ROOTconfig.RootSelectionMode) {
+        if (ROOTconfig.RootSelectionMode.indexOf("Every Element Completely At Left And Above The Current Mouse Position In The whole Document") >= 0) {
+            var firstUsefulElement = $("body *").not("script")[0];
+            // sanity check
+            if (firstUsefulElement != null) {
+                var ret003;
+                var currentTextInStorage = getAllTextFromStorage();
+                ret003 = checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(firstUsefulElement, currentTextInStorage);
+                textToPutInStorage = ret003.newText;
+            }
+        } else if (ROOTconfig.RootSelectionMode.indexOf("Top is invisible and bottom is very high in screen") >= 0) {
+            var arrayOfSimpleElements = getAllUsefulElements();
+            // start with current text in storage, then add after it
+            textToPutInStorage = getAllTextFromStorage();
+            if (arrayOfSimpleElements != null) {
+                for (var iii = 0; iii < arrayOfSimpleElements.length; iii++) {
+                    var el = arrayOfSimpleElements[iii];
+                    var areBasicSentenceCriteriaMet = isThereEnoughValidTextInThisElement(el);
+                    var isShifted = isElementBeingShiftedOut(el);
+                    var isVert = isCursorVerticallyInsideThisElementArea(el)
+
+                    // check if we put this el in storage
+                    var isItInZone = (areBasicSentenceCriteriaMet && isShifted && isVert);
+                    if (isItInZone) {
+                        // check if already in storage
+                        var inText = el.innerText;
+                        if(textToPutInStorage.indexOf(inText) < 0) {
+                            // add this text
+                            textToPutInStorage += inText;
+                        }
+                    }
+                }
+            }
+        }
         replaceStorage(textToPutInStorage);
     }
 }
@@ -418,6 +502,11 @@ function parseAllPageAndSaveTextInCurrentReadingZone() {
 function autoReschedulingPeriodicGreying() {
     if(0) console.log("autoReschedulingPeriodicGreying starting");
     if(1) console.log("1   " + getTimeNow() + "ms");
+    previousCurrX = currX;
+    previousCurrY = currY;
+    previousCurrWinPosY = currWinPosY;
+    currWinPosY = window.pageYOffset
+
 //    parseAllPAgeAndDisplayReadZone();
     parseAllPageAndSaveTextInCurrentReadingZone();
     parseAllPageAndGrey();

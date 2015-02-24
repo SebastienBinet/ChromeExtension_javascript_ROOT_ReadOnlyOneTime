@@ -37,6 +37,13 @@ var ROOT_BACKGROUND_COLOR_NOT_LAST_CHILD = "rgba(255, 200, 200, 0.1)";
 //}
 
 
+// get all elements in page that are important
+function getAllUsefulElements() { // all the body, except the scripts 
+    var x = $("body *").not("script").toArray();
+    
+    return x;
+}
+
 function setElementWithThisStyle( el, mode, color ) {
     
     if (el != null &&  mode != null && color != null) {
