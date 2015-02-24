@@ -147,7 +147,7 @@ function parseAllPageAndGrey() {
                 text_element_i = removeDotDotDots(text_element_i);
                  
                 // check if the text of this element is not empty and found in the Storage
-                var isTreeAllFound = ((text_element_i.length > 0) && (allTextFromStorage.indexOf(text_element_i) >= 0));
+                var isTreeAllFound = ((text_element_i.length > 0) && (allTextFromStorage != null) && (allTextFromStorage.indexOf(text_element_i) >= 0));
                 // if all text inside this node (includes all children tree) was found in storage
                 if (isTreeAllFound) {
                     // check that there is long enough text directly in this element
@@ -247,7 +247,7 @@ function isElementBeingShiftedOut(el) {
     var pos = getPosInfo(el);
     if(0) console.log("element bottom:" + pos.bottom + "window page y offset:" + currWinPosY + "mouse y:" + currY);
     var elIsSplitByTopOfWindow = pos.top < currWinPosY && pos.bottom > currWinPosY;
-    var elBottomIsNearTheTop = pos.bottom < currWinPosY + 75;
+    var elBottomIsNearTheTop = pos.bottom < currWinPosY + 150;
     var userIsScrollingDown = currWinPosY > previousCurrWinPosY;
 //    if (userIsScrollingDown) {
 //        console.log("scolling down");
