@@ -19,7 +19,8 @@ function chromeTabGetFunctionCallback(tab){
     
     chrome.tabs.executeScript({code: "resetStorage();"});
     if(0) console.log("0=  " + getTimeNow() + "ms");
-    chrome.tabs.executeScript({code: "location.reload();"});
+//    chrome.tabs.executeScript({code: "location.reload();"});
+    chrome.tabs.executeScript({code: "resetElementStyleAllElementsInPage();"});
     if(0) console.log("0== " + getTimeNow() + "ms");
 }
 

@@ -44,25 +44,49 @@ function getAllUsefulElements() { // all the body, except the scripts
     return x;
 }
 
+function resetElementStyleAllElementsInPage() {
+    var arrayOfSimpleElements = getAllUsefulElements();
+    if (arrayOfSimpleElements != null) {
+        for (var iii = 0; iii < arrayOfSimpleElements.length; iii++) {
+            var el = arrayOfSimpleElements[iii];
+            resetElementStyle(el);
+        }
+    }
+}
 
 function resetElementStyle( el ) {
     
     if (el != null ) {
-        el.style.backgroundColor = "initial";
-        el.style.color = "initial";
+        var thisNode;
+        thisNode = el.getAttributeNode("data-root-style-background-color"); 
+        if (thisNode != null) {
+            var originalbackgroundColor = thisNode.value; 
+            el.style.backgroundColor = originalbackgroundColor;
+        }
+        thisNode = el.getAttributeNode("data-root-style-font-color"); 
+        if (thisNode != null) {
+            var originalFontColor = thisNode.value; 
+            el.style.color = originalFontColor;
+        }
     }
-//    el.style.borderRadius = "15px";
 }
 
 function setElementWithThisStyle( el, mode, color ) {
     
     if (el != null &&  mode != null && color != null) {
-        //>>>>>>>>>>>>>>>>>>resetElementStyle( el );
 
         if (mode.indexOf("Background Single Solid Color") >= 0) {
+            // save previous background color
+            var backgroundColor = el.style.backgroundColor;
+            el.setAttribute("data-root-style-background-color", backgroundColor);
+            // set new background color
             el.style.backgroundColor = color;
         } else if(mode.indexOf("Overlay Box Alpha With Actual Background Color") >= 0) {
         } else if(mode.indexOf("Font Solid Color") >= 0) {
+           // save previous font color
+            var fontColor = el.style.color;
+            el.setAttribute("data-root-style-font-color", fontColor);
+            // set new background color
             el.style.color = color;
         }
     }

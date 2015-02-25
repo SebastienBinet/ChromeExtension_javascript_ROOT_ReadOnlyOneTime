@@ -1,0 +1,23 @@
+BUG LIST
+
+-done 1004 - google.ca, chercher pour "ETS Canada is part of the world�s largest private educational"
+ne met pas ceci en gris  
+"ETS Canada is part of the world�s largest private educational testing and ... Educational Testing Service Canada Inc. ... Register for the TOEFL® iBT test now!"
+meme s'il y a le texte suivant dans le local storage:
+"ETS Canada is part of the world�s largest private educational testing and ... Educational Testing Service Canada Inc. ... Register for the TOEFL® iBT test now!"
+
+
+-done 1003-http://www.caij.qc.ca/bibliotheque/banques-de-donnees-sans-frais
+selectionne ce text comme lu, meme si souris est sur une autre colonnwe du tableau:
+"Toutes les bibliothèques, sauf celle de la Cour du Québec/Chambre de la jeunesse."
+
+-done 1002-http://www.caij.qc.ca/bibliotheque/banques-de-donnees-sans-frais
+ne met pas en gris le texte suivant:
+"Banque du Centre de documentation et de ressources informationnelles (CDRI) de la chambre des notaires."
+
+-done 1001-http://www.caij.qc.ca/bibliotheque/banques-de-donnees-sans-frais#AccesLegal
+ne met pas en gris le texte suivant:
+"Cet accès sans frais est réservé aux membres du CAIJ et est disponible à partir des postes de travail situés dans les bibliothèques du CAIJ"
+
+
+-done 1000-Changes font to black

@@ -466,8 +466,8 @@ function checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(e
 function parseAllPageAndSaveTextInCurrentReadingZone() {
         
         
- var textToPutInStorage;
- if (ROOTconfig && ROOTconfig.RootSelectionMode) {
+    var textToPutInStorage;
+    if (ROOTconfig && ROOTconfig.RootSelectionMode) {
         if (ROOTconfig.RootSelectionMode.indexOf("Every Element Completely At Left And Above The Current Mouse Position In The whole Document") >= 0) {
             var firstUsefulElement = $("body *").not("script")[0];
             // sanity check
@@ -484,17 +484,20 @@ function parseAllPageAndSaveTextInCurrentReadingZone() {
             if (arrayOfSimpleElements != null) {
                 for (var iii = 0; iii < arrayOfSimpleElements.length; iii++) {
                     var el = arrayOfSimpleElements[iii];
+                    var isThereTextDirectly = isThereValidTextDirectlyInThisElement(el);
                     var areBasicSentenceCriteriaMet = isThereEnoughValidTextInThisElement(el);
                     var isShifted = isElementBeingShiftedOut(el);
                     var isVert = isCursorVerticallyInsideThisElementArea(el)
 
                     // check if we put this el in storage
-                    var isItInZone = (areBasicSentenceCriteriaMet && isShifted && isVert);
+                    var isItInZone = (isThereTextDirectly && areBasicSentenceCriteriaMet && isShifted && isVert);
                     if (isItInZone) {
-                        // check if already in storage
+                        // remove the dots
                         var inText = el.innerText;
+                        inText = removeDotDotDots(inText);
                         if(textToPutInStorage.indexOf(inText) < 0) {
-                            // add this text
+                            // it is not already in storage
+                            // so add this text
                             textToPutInStorage += inText;
                         }
                     }
