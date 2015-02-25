@@ -157,8 +157,8 @@ function parseAllPageAndGrey() {
                     // if found and there are long enough text directly at this level, put it in grey
                     if(thereIsUsefulTextDirectly || lastChild) {
                         setElementWithRootStyleUsefulTextDirectly(element_i, ROOTconfig);
-                        // we do not need to parse children, so try to go to next sibbling
-                        afterThisElement_stopGoingDown = true;
+// is this true?                        // we do not need to parse children, so try to go to next sibbling
+//                        afterThisElement_stopGoingDown = true;
                     } else {
                         setElementWithRootStyleUsefulNoTextDirectly(element_i);
                     }

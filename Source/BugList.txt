@@ -1,5 +1,8 @@
 BUG LIST
 
+
+-done 1005 - reouvert 1002
+
 -done 1004 - google.ca, chercher pour "ETS Canada is part of the world�s largest private educational"
 ne met pas ceci en gris  
 "ETS Canada is part of the world�s largest private educational testing and ... Educational Testing Service Canada Inc. ... Register for the TOEFL® iBT test now!"
