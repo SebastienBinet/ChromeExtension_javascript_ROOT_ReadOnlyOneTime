@@ -1,32 +1,46 @@
+/*global replaceStorage */
+/*global $, jQuery, alert*/
+/*global chrome */
+
+/*jslint devel: true */
+/*jslint browser: true*/
+
+var debLogA = 1;
+var debLogB = 1;
+
 function getTimeNow() {
-    return  (new Date()).getTime() % 65536;
+    "use strict";
+    return (new Date()).getTime() % 65536;
 
 }
-if(1) console.log("0%  " + getTimeNow() + "ms");
+
+if (debLogA) {console.log("0%  " + getTimeNow() + "ms"); }
 
 var currentRootConfig = null;
 
 // Obtain the preferences stored in chrome.storage.
 function retrieve_ROOT_options() {
-  chrome.storage.sync.get({
-    RootColor: 'yellow',
-    RootNbWordMatch: '4',
-    RootGreyMode: 'Font Solid Color',
-    RootSelectionMode: 'Top is invisible and bottom is very high in screen',
-    RootVisualFeedback: 'none'
-  }, function(items) {
-      currentRootConfig = items;
-      if(0) console.log("Config color is currently: " + currentRootConfig.RootColor);
-  });
+    "use strict";
+    chrome.storage.sync.get({
+        RootColor: 'yellow',
+        RootNbWordMatch: '4',
+        RootGreyMode: 'Font Solid Color',
+        RootSelectionMode: 'Top is invisible and bottom is very high in screen',
+        RootVisualFeedback: 'none'
+    }, function (items) {
+        currentRootConfig = items;
+        if (debLogB) {console.log("Config color is currently: " + currentRootConfig.RootColor); }
+    });
 }
 
 function get_ROOT_options() {
+    "use strict";
     retrieve_ROOT_options();
     return currentRootConfig;
 }
 
 function getAllTextFromStorage() {
-    
+    "use strict";
     var currentLocaleStorageText = "";
     // Check browser support
 	if (typeof (Storage) !== "undefined") {
@@ -38,35 +52,37 @@ function getAllTextFromStorage() {
 
 
 function resetStorage() {
+    "use strict";
 	if (typeof (Storage) !== "undefined") {
 		// Store
         replaceStorage("EMPTY");
         localStorage.setItem("B4D.test001.numberOfOpenPages", 0);
-        if(1) console.log("size of locale storage: 0");
-        if(1) console.log("0%% " + getTimeNow() + "ms");
-   }    
+        if (debLogA) {console.log("size of locale storage: 0"); }
+        if (debLogA) {console.log("0%% " + getTimeNow() + "ms"); }
+    }
 }
 
 
-function addThisToStorage( textToAdd ) {
+function addThisToStorage(textToAdd) {
+    "use strict";
 	if (typeof (Storage) !== "undefined") {
 		// Retrieve
-        var currentLocaleStorageText = getAllTextFromStorage();
+        var currentLocaleStorageText = getAllTextFromStorage(),
 		// Store
-        var newText = currentLocaleStorageText + textToAdd;
+            newText = currentLocaleStorageText + textToAdd;
         replaceStorage(newText);
-        if(1) console.log("size of locale storage:" + newText.length);
+        if (debLogA) {console.log("size of locale storage:" + newText.length); }
         
-    }    
-    
+    }
 }
 
-function replaceStorage( textToStore ) {
+function replaceStorage(textToStore) {
+    "use strict";
 	if (typeof (Storage) !== "undefined") {
         localStorage.setItem("B4D.test001.name", textToStore);
-        if(1) console.log("size of locale storage:" + textToStore.length);
+        if (debLogA) {console.log("size of locale storage:" + textToStore.length); }
         
-    }    
+    }
     
 }
 
