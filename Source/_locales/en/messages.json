@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "ROOT",
+    "description": "ROOT:  R-ead  O-nly  O-ne  T-ime"
+  },
+  "appDesc": {
+    "message": "This extension saves you time by putting in grey all text that you have already read previously.", 
+    "description":"This extension saves you time by putting in grey all text that you have already read previously."
+  }
+}

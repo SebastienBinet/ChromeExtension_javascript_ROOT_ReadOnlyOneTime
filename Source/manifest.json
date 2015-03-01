@@ -1,9 +1,10 @@
 {
   "manifest_version": 2,
 
-  "name": "ROOT",
-  "description": "ROOT",
-  "version": "1.1.8",
+  "name": "__MSG_appName__",
+  "description": "__MSG_appDesc__",
+  "default_locale": "en",
+  "version": "1.1.10",
 
     
   "options_ui": {
@@ -31,7 +32,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["jquery-1.11.2.js", "element_getPosInfo.js", "DOMmanipulations.js", "storageAccesses.js", "content_script_periodic.js"]
+      "js": ["jquery-1.11.2.js", "element_getPosInfo.js", "DOMmanipulations.js", "gestureRecognition.js", "storageAccesses.js", "content_script_periodic.js"]
     }
   ],
   "permissions": [

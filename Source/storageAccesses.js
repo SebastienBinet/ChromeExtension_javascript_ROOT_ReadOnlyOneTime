@@ -51,6 +51,10 @@ function getAllTextFromStorage() {
 }
 
 
+function removeLatestTextFromStorage() {
+    "use strict";
+}
+
 function resetStorage() {
     "use strict";
 	if (typeof (Storage) !== "undefined") {

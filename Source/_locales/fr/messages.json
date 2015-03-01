@@ -1,0 +1,25 @@
+{
+  "appName": {
+    "message": "ROOT",
+    "description": "ROOT:  R-ead  O-nly  O-ne  T-ime  = lisez seulement une fois"
+  },
+  "appDesc": {
+    "message": "Cette extension sauve votre temps car elle met en gris le texte que vous avez déjà lu auparavant.", 
+    "description":"Cette extension sauve votre temps car elle met en gris le texte que vous avez déjà lu auparavant.
+
+      
+ROOT ( 'Read Only One Time' ) vous permet d'éviter de lire plusieurs fois la même information sur internet.
+
+Voici comment ROOT fonctionne:
+1-Vous lisez une page web comme d'habitude. ROOT détecte le texte que vous avez fini de lire.
+2-À partir de ce moment, peu importe sur quelle page web vous naviguez sur le même site, si ROOT re-trouve des elements de page que vous avez déjà visité, il les affichera avec un fond gris.
+3-Vous pouvez maintenant vous concentrer à lire seulement ce que vous n'avez jamais lu.
+4-Et vous sauverez de plus en plus du temps au fur-et-à mesure que vous utiliserez ROOT.
+
+Note: ROOT est présentement gratuit (puisque cet outil n'est qu'à l'état de prototype).
+Installez-le dès aujourd'hui et vous verrez l'évolution.
+
+Note: le bouton 'ROOT' en haut à droite dit à l'outil de recommencer à neuf l'aide pour ce site. Cela peut parfois être ce que vous voulez. 
+"
+  }
+}

@@ -1,5 +1,8 @@
 BUG LIST
 
+1006 - pas en gris
+http://recherche.lapresse.ca/cyberpresse/search/theme/lapresse?q=bixi&or%5B%5D=chiffres+frais&rangeRel=-1y&sort=recent
+
 
 -done 1005 - reouvert 1002
 

@@ -83,9 +83,15 @@ function getTimeNow() {
 
 function checkIfUndoRequested() {
     "use strict";
+    console.log("================================================curr:" + currX + "," + currY + " - and win:" + currWinPosX + "," + currWinPosY);
     // if cursor in top/left corner of the visible window, remove some text from the end of the storage
-    var isInCorner = (currX <= 10) && (currY <= 10);
-    return isInCorner;
+    var isInCorner = (currX <= 10 + currWinPosX) && (currY <= 10 + currWinPosY);
+    if (isInCorner) {
+        var currentTextInStorage = getAllTextFromStorage();
+        // temporary: remove 100 chars each time
+        var textToPutInStorage = currentTextInStorage.slice(0, -100);
+        replaceStorage(textToPutInStorage);
+    }
 }
 
 
@@ -557,7 +563,9 @@ function autoReschedulingPeriodicGreying() {
     console.log("1   " + getTimeNow() + "ms");
     previousCurrX = currX;
     previousCurrY = currY;
+    previousCurrWinPosX = currWinPosX;
     previousCurrWinPosY = currWinPosY;
+    currWinPosX = window.pageXOffset;
     currWinPosY = window.pageYOffset;
 
 //    parseAllPAgeAndDisplayReadZone();
