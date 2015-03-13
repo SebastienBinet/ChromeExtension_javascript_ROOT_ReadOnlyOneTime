@@ -48,7 +48,7 @@ function restore_options() {
     // Use default value color in case the storage is not accessible.
     chrome.storage.sync.get({
         likesColor: true,
-        RootColor: 'yellow',
+        RootColor: 'Lavender',
         RootNbWordMatch: '4',
         RootGreyMode: 'Font Solid Color',
         RootSelectionMode: 'Top is invisible and bottom is very high in screen',
@@ -69,7 +69,7 @@ function read_current_options() {
     // Use default value color in case the storage is not accessible.
     chrome.storage.sync.get({
         likesColor: true,
-        RootColor: 'yellow',
+        RootColor: 'Lavender',
         RootNbWordMatch: '4',
         RootGreyMode: 'Font Solid Color',
         RootSelectionMode: 'Top is invisible and bottom is very high in screen',

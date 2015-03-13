@@ -7,7 +7,12 @@
 /*jslint browser: true*/
 /*jslint vars:true */
 
-var GESTURE_RECOGNITION_PERIOD_MS = 50; // ms
+//var GESTURE_RECOGNITION_PERIOD_MS = 50; // ms
+
+var SelfTestActivated = true;
+var DEB = false; // is "DEB"ug log enabled? 
+var NB_OF_ECHANTILLONS_TO_KEEP = 20;
+
 //in progress - function oneCapture() {
 //    this.toString = function() {
 //        var retString = "";
@@ -32,7 +37,9 @@ var getMouseGestureStatus; // function  forward declaration
 
 
 
-
+if (SelfTestActivated) {
+var initial_nb_of_ech = NB_OF_ECHANTILLONS_TO_KEEP;
+NB_OF_ECHANTILLONS_TO_KEEP = 20;
 validateDetection(
     "543hjk345",
     [
@@ -104,10 +111,10 @@ validateDetection(
         {x: 1050, qtyR: 4, was3R: true,  av: 1035, min: 925, max: 1100},//                                 .  |
         {x: 1050, qtyR: 4, was3R: true,  av: 1035, min: 925, max: 1100},//                                 .  |
         {x: 1050, qtyR: 4, was3R: true,  av: 1035, min: 925, max: 1100},//                                 .  |
-        {x: 1050, qtyR: 2, was3R: true,  av: 1035, min: 925, max: 1100},//                                  .  |
-        {x: 1050, qtyR: 2, was3R: false, av:   -1, min:  -1, max:   -1},//                                  . |
-        {x: 1050, qtyR: 2, was3R: false, av:   -1, min:  -1, max:   -1},//                                  . |
-        {x: 1050, qtyR: 2, was3R: false, av:   -1, min:  -1, max:   -1},//                                  . |
+        {x: 1050, qtyR: 2, was3R: true,  av: 1035, min: 925, max: 1100},//                                 .  |
+        {x: 1050, qtyR: 2, was3R: false, av:   -1, min:  -1, max:   -1},//                                    |
+        {x: 1050, qtyR: 2, was3R: false, av:   -1, min:  -1, max:   -1},//                                    |
+        {x: 1050, qtyR: 2, was3R: false, av:   -1, min:  -1, max:   -1},//                                    |
         {x: 1050, qtyR: 1, was3R: false, av:   -1, min:  -1, max:   -1},//                                    |
         {x: 1050, qtyR: 1, was3R: false, av:   -1, min:  -1, max:   -1},//                                    |
         {x: 1050, qtyR: 1, was3R: false, av:   -1, min:  -1, max:   -1},//                                    |
@@ -118,12 +125,11 @@ validateDetection(
     ]
 );
 
-
 function validateDetection(id, testVector) {
     "use strict";
     var i;
     var errorWasDetected = false;
-    document.writeln("<br> starting test with id: " + id + "<br> ");
+    if (DEB) document.writeln("<br> starting test with id: " + id + "<br> ");
 
     for (i = 0; i < testVector.length; i++) {
         addThisMouseCoordinate(testVector[i].x);
@@ -145,10 +151,18 @@ function validateDetection(id, testVector) {
             errorWasDetected = true;
         }
     }
-    document.writeln("<br> finishing test with  id: " + id + "<br> ");
+    if (DEB) document.writeln("<br> finishing test with  id: " + id + "<br> ");
 
 }
 
+// After the validation, flush the last20Captures array
+last20Captures.length = 0;
+//restore the value;
+NB_OF_ECHANTILLONS_TO_KEEP = initial_nb_of_ech;
+
+}
+
+SelfTestActivated = false;
 
 function helper_valueIfNotNullElseMinus1(x) {
     "use strict";
@@ -161,128 +175,151 @@ function helper_valueIfNotNullElseMinus1(x) {
 
 function addThisMouseCoordinate(x) {
     "use strict";
-    // drop oldest value
-    var currentLength = last20Captures.length;
-    if (currentLength === 20) {
+    // handle only when when mouse is inside the window
+    if (x >= 0) {
+        
+        var tetete = x / 10;
+        var tetetestring = "";
+        for (var iiii = 0; iiii < tetete; iiii++) {
+            tetetestring = tetetestring.concat(" ");
+        }
+        tetetestring = tetetestring.concat(".");
+        console.log(tetetestring);
+        
+        // handle when buffer is already full
+        var currentLength = last20Captures.length;
+        if (currentLength === NB_OF_ECHANTILLONS_TO_KEEP) {
+            // drop oldest value
+            last20Captures.shift();
+        }
+
+        last20Captures.push({
+            x: x,
+            isThereAnEraseGesture: false,
+            isTheMouseStillMoving: false,
+            averageLast3Reverses: -1, // average Last 3 Reverses
+            minInLast3Reverses: -1,
+            maxInLast3Reverses: -1
+        });
+        var newLength = last20Captures.length;
+    //    last20Captures[newLength - 1].x = x;
+        if (DEB) console.log(">>>>>add>> x:" + x);
+        var index;
+        var qtyReverse = 0;
+        var isThereAReverseCausedByThisCapture;
+        var somme = 0;
+        var extremePositionThatThisMovementHasReached = last20Captures[0].x;
+        var currentlyInAMoveToRight = true;
+        var averageLast3Reverses = -1;
+
+        // identify the number of reverse
+        for (index = 0; index < newLength; index++) {
+            var xAtThisIndex = last20Captures[index].x;
+            isThereAReverseCausedByThisCapture = false;
+    //        if (areWeLookingForANewMax && (xAtThisIndex > immediateMovingWindowMax)) {
+    //            // we are moving the immediate window right
+    //            immediateMovingWindowMax = xAtThisIndex;
+    //            immediateMovingWindowMin = xAtThisIndex - 100;
+    //            areWeLookingForANewMin = true;
+    //            areWeLookingForANewMax = false;
+    //            qtyReverse++;
+    //            isThereAReverseCausedByThisCapture = true;
+    //        } else if (areWeLookingForANewMin && (xAtThisIndex < immediateMovingWindowMin)) {
+    //            // we are moving the immediate window left
+    //            immediateMovingWindowMin = xAtThisIndex;
+    //            immediateMovingWindowMax = xAtThisIndex + 100;
+    //            areWeLookingForANewMin = false;
+    //            areWeLookingForANewMax = true;
+    //            qtyReverse++;
+    //            isThereAReverseCausedByThisCapture = true;
+    //        }
+            // Check which direction we were previously moving
+            if (currentlyInAMoveToRight) {
+                 // We were lately mostly moving to the right
+                // Check if we can say that we have now started moving left
+                if (xAtThisIndex < extremePositionThatThisMovementHasReached - REVERSE_THRESHOLD) {
+                    // We have changed direction, now starting a move period to the left
+                    currentlyInAMoveToRight = false;
+                    qtyReverse++;
+                    isThereAReverseCausedByThisCapture = true;
+                    // we now consider that position as the extreme that we have travelled in that new direction up to now
+                    extremePositionThatThisMovementHasReached = xAtThisIndex;
+                } else {
+                    // We consider that we are still mostly moving to the right
+                    // Check if we are even farter then the previous extrem right position reached during that move
+                    if (xAtThisIndex > extremePositionThatThisMovementHasReached) {
+                        // we are even farter than the last max, so we now consider this position as the extrem
+                        extremePositionThatThisMovementHasReached = xAtThisIndex;
+                    }
+                }
+            } else {
+                // We were lately mostly moving to the left
+                // Check if we can say that we have now started moving right
+                if (xAtThisIndex > extremePositionThatThisMovementHasReached + REVERSE_THRESHOLD) {
+                    // We have changed direction, now starting a move period to the right
+                    currentlyInAMoveToRight = true;
+                    qtyReverse++;
+                    isThereAReverseCausedByThisCapture = true;
+                    // we now consider that position as the extreme that we have travelled in that new direction up to now
+                    extremePositionThatThisMovementHasReached = xAtThisIndex;
+                } else {
+                    // We consider that we are still mostly moving to the left
+                    // Check if we are even farter then the previous extrem left position reached during that move
+                    if (xAtThisIndex < extremePositionThatThisMovementHasReached) {
+                        // we are even farter than the last min, so we now consider this position as the extrem
+                        extremePositionThatThisMovementHasReached = xAtThisIndex;
+                    }
+                }
+            }
+            last20Captures[index].qtyReverse = qtyReverse;
+            last20Captures[index].isThereAReverseCausedByThisCapture = isThereAReverseCausedByThisCapture;
+            if (DEB) console.log("   [" + index + "]=" + xAtThisIndex + ", newLength:" + newLength + ", " + "extrem:" + extremePositionThatThisMovementHasReached + ", to right?:" + currentlyInAMoveToRight + ", " + qtyReverse + ", " + isThereAReverseCausedByThisCapture);
+            if (DEB) console.log("");
+        }
+
+        // if there is at least 3 reverse in the last 20 captures, process them
+        if (qtyReverse >= 3) {
+            var qtyReverseTemp = 0;
+            var qtyCaptureInLast3Reverses = 0;
+            var minInLast3Reverses = last20Captures[newLength - 1].x;
+            var maxInLast3Reverses = last20Captures[newLength - 1].x;
+            for (index = newLength - 1; index >= 0 && qtyReverseTemp < 3; index--) {
+                if (last20Captures[index].isThereAReverseCausedByThisCapture) {
+                    qtyReverseTemp++;
+                }
+                qtyCaptureInLast3Reverses++;
+                somme += last20Captures[index].x;
+
+                if (last20Captures[index].x <= minInLast3Reverses) {
+                    minInLast3Reverses = last20Captures[index].x;
+                } else if (last20Captures[index].x >= maxInLast3Reverses) {
+                    maxInLast3Reverses = last20Captures[index].x;
+                }
+                if (DEB) console.log("   index:" + index + " qty:" + qtyReverseTemp + ", somme" + somme + ", min:" + minInLast3Reverses + ", max:" + maxInLast3Reverses);
+            }
+            console.log(" qty:" + qtyReverseTemp + ", somme" + somme + ", min:" + minInLast3Reverses + ", max:" + maxInLast3Reverses);
+
+            // compute average
+            averageLast3Reverses = somme / qtyCaptureInLast3Reverses;
+            if (DEB) console.log("  avrg:" + averageLast3Reverses);
+
+            // store info in array
+            last20Captures[newLength - 1].isThereAnEraseGesture = (qtyReverse >= 3);
+            last20Captures[newLength - 1].averageLast3Reverses  = helper_valueIfNotNullElseMinus1(averageLast3Reverses);
+            last20Captures[newLength - 1].minInLast3Reverses    = minInLast3Reverses;
+            last20Captures[newLength - 1].maxInLast3Reverses    = maxInLast3Reverses;
+            
+            // indicate if the mouse is still moving or if it has stayed at the same place for last 200ms
+            if ((last20Captures[newLength - 1].x !== last20Captures[newLength - 2].x) && (last20Captures[newLength - 1].x !== last20Captures[newLength - 3].x)) {
+                last20Captures[newLength - 1].isTheMouseStillMoving = true;
+            }
+        }
+        //    if (DEB) console.log("  last20Captures[" + (newLength - 1) + "]:" + last20Captures[newLength - 1].toSource());
+        if (DEB) console.log("  last20Captures[" + (newLength - 1) + "]:" + JSON.stringify(last20Captures[newLength - 1]));
+    } else {
+        // When mouse is ouside the window, remove oldest coordinate
         last20Captures.shift();
     }
-    
-    last20Captures.push({
-        x: x,
-        isThereAnEraseGesture: false,
-        averageLast3Reverses: -1, // average Last 3 Reverses
-        minInLast3Reverses: -1,
-        maxInLast3Reverses: -1
-    });
-    var newLength = last20Captures.length;
-//    last20Captures[newLength - 1].x = x;
-    console.log(">>>>>add>> x:" + x);
-    var index;
-    var qtyReverse = 0;
-    var isThereAReverseCausedByThisCapture;
-    var somme = 0;
-    var extremePositionThatThisMovementHasReached = last20Captures[0].x;
-    var currentlyInAMoveToRight = true;
-    var averageLast3Reverses = -1;
-    
-    // identify the number of reverse
-    for (index = 0; index < newLength; index++) {
-        var xAtThisIndex = last20Captures[index].x;
-        isThereAReverseCausedByThisCapture = false;
-//        if (areWeLookingForANewMax && (xAtThisIndex > immediateMovingWindowMax)) {
-//            // we are moving the immediate window right
-//            immediateMovingWindowMax = xAtThisIndex;
-//            immediateMovingWindowMin = xAtThisIndex - 100;
-//            areWeLookingForANewMin = true;
-//            areWeLookingForANewMax = false;
-//            qtyReverse++;
-//            isThereAReverseCausedByThisCapture = true;
-//        } else if (areWeLookingForANewMin && (xAtThisIndex < immediateMovingWindowMin)) {
-//            // we are moving the immediate window left
-//            immediateMovingWindowMin = xAtThisIndex;
-//            immediateMovingWindowMax = xAtThisIndex + 100;
-//            areWeLookingForANewMin = false;
-//            areWeLookingForANewMax = true;
-//            qtyReverse++;
-//            isThereAReverseCausedByThisCapture = true;
-//        }
-        // Check which direction we were previously moving
-        if (currentlyInAMoveToRight) {
-             // We were lately mostly moving to the right
-            // Check if we can say that we have now started moving left
-            if (xAtThisIndex < extremePositionThatThisMovementHasReached - REVERSE_THRESHOLD) {
-                // We have changed direction, now starting a move period to the left
-                currentlyInAMoveToRight = false;
-                qtyReverse++;
-                isThereAReverseCausedByThisCapture = true;
-                // we now consider that position as the extreme that we have travelled in that new direction up to now
-                extremePositionThatThisMovementHasReached = xAtThisIndex;
-            } else {
-                // We consider that we are still mostly moving to the right
-                // Check if we are even farter then the previous extrem right position reached during that move
-                if (xAtThisIndex > extremePositionThatThisMovementHasReached) {
-                    // we are even farter than the last max, so we now consider this position as the extrem
-                    extremePositionThatThisMovementHasReached = xAtThisIndex;
-                }
-            }
-        } else {
-            // We were lately mostly moving to the left
-            // Check if we can say that we have now started moving right
-            if (xAtThisIndex > extremePositionThatThisMovementHasReached + REVERSE_THRESHOLD) {
-                // We have changed direction, now starting a move period to the right
-                currentlyInAMoveToRight = true;
-                qtyReverse++;
-                isThereAReverseCausedByThisCapture = true;
-                // we now consider that position as the extreme that we have travelled in that new direction up to now
-                extremePositionThatThisMovementHasReached = xAtThisIndex;
-            } else {
-                // We consider that we are still mostly moving to the left
-                // Check if we are even farter then the previous extrem left position reached during that move
-                if (xAtThisIndex < extremePositionThatThisMovementHasReached) {
-                    // we are even farter than the last min, so we now consider this position as the extrem
-                    extremePositionThatThisMovementHasReached = xAtThisIndex;
-                }
-            }
-        }
-        last20Captures[index].qtyReverse = qtyReverse;
-        last20Captures[index].isThereAReverseCausedByThisCapture = isThereAReverseCausedByThisCapture;
-        console.log("   [" + index + "]=" + xAtThisIndex + ", newLength:" + newLength + ", " + "extrem:" + extremePositionThatThisMovementHasReached + ", to right?:" + currentlyInAMoveToRight + ", " + qtyReverse + ", " + isThereAReverseCausedByThisCapture);
-        console.log("");
-    }
-    
-    // if thre is at least 3 reverse in the last 20 captures, process them
-    if (qtyReverse >= 3) {
-        var qtyReverseTemp = 0;
-        var qtyCaptureInLast3Reverses = 0;
-        var minInLast3Reverses = last20Captures[newLength - 1].x;
-        var maxInLast3Reverses = last20Captures[newLength - 1].x;
-        for (index = newLength - 1; index >= 0 && qtyReverseTemp < 3; index--) {
-            if (last20Captures[index].isThereAReverseCausedByThisCapture) {
-                qtyReverseTemp++;
-            }
-            qtyCaptureInLast3Reverses++;
-            somme += last20Captures[index].x;
-            
-            if (last20Captures[index].x <= minInLast3Reverses) {
-                minInLast3Reverses = last20Captures[index].x;
-            } else if (last20Captures[index].x >= maxInLast3Reverses) {
-                maxInLast3Reverses = last20Captures[index].x;
-            }
-            console.log("   index:" + index + " qty:" + qtyReverseTemp + ", somme" + somme + ", min:" + minInLast3Reverses + ", max:" + maxInLast3Reverses);
-        }
-        
-        // compute average
-        averageLast3Reverses = somme / qtyCaptureInLast3Reverses;
-        console.log("  avrg:" + averageLast3Reverses);
-        
-        // store info in array
-        last20Captures[newLength - 1].isThereAnEraseGesture = (qtyReverse >= 3);
-        last20Captures[newLength - 1].averageLast3Reverses  = helper_valueIfNotNullElseMinus1(averageLast3Reverses);
-        last20Captures[newLength - 1].minInLast3Reverses    = minInLast3Reverses;
-        last20Captures[newLength - 1].maxInLast3Reverses    = maxInLast3Reverses;
-    }
-//    console.log("  last20Captures[" + (newLength - 1) + "]:" + last20Captures[newLength - 1].toSource());
-    console.log("  last20Captures[" + (newLength - 1) + "]:" + JSON.stringify(last20Captures[newLength - 1]));
         
 }
 
@@ -292,26 +329,38 @@ function addThisMouseCoordinate(x) {
 function getMouseGestureStatus() {
     "use strict";
     var currentLength = last20Captures.length;
-    var ret = {
-        qtyReverse:            last20Captures[currentLength - 1].qtyReverse,
-        isThereAnEraseGesture: last20Captures[currentLength - 1].isThereAnEraseGesture,
-        averageLast3Reverses:  last20Captures[currentLength - 1].averageLast3Reverses,
-        minInLast3Reverses:    last20Captures[currentLength - 1].minInLast3Reverses,
-        maxInLast3Reverses:    last20Captures[currentLength - 1].maxInLast3Reverses
-    };
-    console.log("  ret:" + JSON.stringify(ret));
+    if (currentLength > 0) {
+        var ret = {
+            qtyReverse:            last20Captures[currentLength - 1].qtyReverse,
+            isThereAnEraseGesture: last20Captures[currentLength - 1].isThereAnEraseGesture,
+            isTheMouseStillMoving: last20Captures[currentLength - 1].isTheMouseStillMoving,
+            averageLast3Reverses:  last20Captures[currentLength - 1].averageLast3Reverses,
+            minInLast3Reverses:    last20Captures[currentLength - 1].minInLast3Reverses,
+            maxInLast3Reverses:    last20Captures[currentLength - 1].maxInLast3Reverses
+        };
+    } else {
+        var ret = {
+            qtyReverse:            0,
+            isThereAnEraseGesture: false,
+            isTheMouseStillMoving: false,
+            averageLast3Reverses:  -1,
+            minInLast3Reverses:    -1,
+            maxInLast3Reverses:    -1
+        };        
+    }
+    if (DEB) console.log("  ret:" + JSON.stringify(ret));
     return ret;
 }
 
 
 
-function autoReschedulingPeriodicGestureAnalysis() {
-    "use strict";
-    setTimeout(autoReschedulingPeriodicGestureAnalysis, GESTURE_RECOGNITION_PERIOD_MS);
-}
+//function autoReschedulingPeriodicGestureAnalysis() {
+//    "use strict";
+//    //setTimeout(autoReschedulingPeriodicGestureAnalysis, GESTURE_RECOGNITION_PERIOD_MS);
+//}
 
 $(document).ready(function () {
     "use strict";
-    autoReschedulingPeriodicGestureAnalysis();
+    //autoReschedulingPeriodicGestureAnalysis();
 });
     

@@ -74,7 +74,7 @@ function findElementWithThisText(node, stringAndPosInPage) {
 
     var parseInfo = {
         nbCharParsed: 0,   // this is the number of char analysed during this call
-        element   : null // at the end of the recursive calls this will contain the elemnt index.
+        element   : null // at the end of the recursive calls this will contain the element index.
     };
 
     if (node.nodeType === 3) {

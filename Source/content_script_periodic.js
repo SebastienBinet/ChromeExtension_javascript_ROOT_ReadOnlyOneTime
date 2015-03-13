@@ -1,4 +1,5 @@
 
+var DEB_periodic = 0;
 /*global get_ROOT_options */
 /*global getAllTextFromStorage */
 /*global getAllUsefulElements */
@@ -26,6 +27,7 @@
 // This script is injected in all pages.
 
 var ROOT_PERIOD_MS = 200;
+//var MOUSE_POS_CAPTURE_PERIOD_MS = 1000;
 var ROOT_BACKGROUND_COLOR_LAST_CHILD = "rgba(185, 220, 200, 0.9)";
 var currentRootColorForReadElements; //= ROOT_BACKGROUND_COLOR_LAST_CHILD;
 var currentRootGreyModeForReadElements; //= 'Background Single Solid Color';
@@ -74,6 +76,9 @@ var currWinPosY = -1;
 var previousCurrWinPosX = -1;
 var previousCurrWinPosY = -1;
 
+// for visible feedback
+var DoAllTheseBlinks = 0;
+
 
 function getTimeNow() {
     "use strict";
@@ -81,16 +86,50 @@ function getTimeNow() {
 
 }
 
-function checkIfUndoRequested() {
+function checkIfUndoRequested_type1() {
     "use strict";
-    console.log("================================================curr:" + currX + "," + currY + " - and win:" + currWinPosX + "," + currWinPosY);
+    //console.log("================================================curr:" + currX + "," + currY + " - and win:" + currWinPosX + "," + currWinPosY);
     // if cursor in top/left corner of the visible window, remove some text from the end of the storage
-    var isInCorner = (currX <= 10 + currWinPosX) && (currY <= 10 + currWinPosY);
+    var isInCorner = (currX >= 0) && (currX <= 10 + currWinPosX) && (currY >= 0) && (currY <= 10 + currWinPosY);
     if (isInCorner) {
         var currentTextInStorage = getAllTextFromStorage();
         // temporary: remove 100 chars each time
-        var textToPutInStorage = currentTextInStorage.slice(0, -100);
+        var textToPutInStorage = currentTextInStorage.slice(0, -500);
         replaceStorage(textToPutInStorage);
+    }
+}
+
+function checkIfUndoRequested_type2() {
+    "use strict";
+    //console.log("================================================curr:" + currX + "," + currY + " - and win:" + currWinPosX + "," + currWinPosY);
+    var status = getMouseGestureStatus();
+    if (status.isThereAnEraseGesture && status.isTheMouseStillMoving) {
+        // remove some text from the end of the storage
+        var currentTextInStorage = getAllTextFromStorage();
+        // temporary: remove 100 chars each time
+        var textToPutInStorage = currentTextInStorage.slice(0, -500);
+        replaceStorage(textToPutInStorage);
+
+        // display some feedback
+        if (DoAllTheseBlinks == 0) {
+            // make it on, then off, then it can be re-armed
+            DoAllTheseBlinks = 2;
+        }
+    }
+    
+    
+    // visual feedback
+    if (DoAllTheseBlinks == 2) {
+        var theBody = $("body")[0];
+        var mode = "Background Single Solid Color";
+        var ROOTconfig = get_ROOT_options();
+        var color = ROOTconfig.RootColor;
+        setElementWithThisStyle(theBody, mode, color);
+        DoAllTheseBlinks--;
+    } else if (DoAllTheseBlinks == 1){
+        var theBody = $("body")[0];
+        resetElementStyle(theBody);
+        DoAllTheseBlinks--;
     }
 }
 
@@ -291,8 +330,8 @@ function isElementBeingShiftedOut(el) {
     var isIt = false;
     var pos = getPosInfo(el);
     //if (0) {console.log("element bottom:" + pos.bottom + "window page y offset:" + currWinPosY + "mouse y:" + currY); }
-    var elIsSplitByTopOfWindow = pos.top < currWinPosY && pos.bottom > currWinPosY;
-    var elBottomIsNearTheTop = pos.bottom < currWinPosY + 150;
+    var elIsSplitByTopOfWindow = pos.top < currWinPosY + 100 && pos.bottom > currWinPosY;
+    var elBottomIsNearTheTop = pos.bottom < currWinPosY + 300;
     var userIsScrollingDown = currWinPosY > previousCurrWinPosY;
 //    if (userIsScrollingDown) {
 //        console.log("scolling down");
@@ -310,7 +349,6 @@ function isCursorVerticallyInsideThisElementArea(el) {
     var isIt = (pos.left <= currX) && (pos.right >= currX);
     return isIt;
 }
-
 
 function isMostOfThisElementLeftAndAboveCurrentMousePosition(el) {
     "use strict";
@@ -560,20 +598,38 @@ function parseAllPageAndSaveTextInCurrentReadingZone() {
 function autoReschedulingPeriodicGreying() {
     "use strict";
     //if (0) {console.log("autoReschedulingPeriodicGreying starting");}
-    console.log("1   " + getTimeNow() + "ms");
+    if (DEB_periodic) console.log("1   " + getTimeNow() + "ms");
     previousCurrX = currX;
     previousCurrY = currY;
     previousCurrWinPosX = currWinPosX;
     previousCurrWinPosY = currWinPosY;
     currWinPosX = window.pageXOffset;
     currWinPosY = window.pageYOffset;
+    
+    
+
 
 //    parseAllPAgeAndDisplayReadZone();
     parseAllPageAndSaveTextInCurrentReadingZone();
     parseAllPageAndGrey();
-    checkIfUndoRequested();
-    console.log("  3 " + getTimeNow() + "ms");
+    checkIfUndoRequested_type1();
+    checkIfUndoRequested_type2();  
+    if (DEB_periodic) console.log("  3 " + getTimeNow() + "ms");
     setTimeout(autoReschedulingPeriodicGreying, ROOT_PERIOD_MS);
+}
+
+function HundredMsTick() {
+    PeriodicGestureMouseProcessing();
+}
+
+var ttttt=0;
+function PeriodicGestureMouseProcessing() {
+    // for gesture recognition:
+    addThisMouseCoordinate(currX);
+    if (++ttttt == 100) {
+        console.log("||" + getTimeNow() + "ms");
+        ttttt = 0;
+    }
 }
 
 //function saveElementToStorage( el ) {
@@ -688,7 +744,7 @@ function leave_el(el) {
                    
     // sanity
     if (el !== hoverInfo.elementUnderMouse) {
-        console.log("ERROR tfgt7sudftg");
+        if (DEB_periodic) console.log("ERROR tfgt7sudftg");
     }
    
 }
@@ -812,9 +868,18 @@ $(document).ready(function () {
 //    var temp22 = analyseArrayOfAllElements(temp11);
    //if(0) {console.log("0+++" + getTimeNow() + "ms");}
     autoReschedulingPeriodicGreying();
+    //autoReschedulingGestureMouseProcessing();
+    setInterval(HundredMsTick, 100);
+//    rescheduleTest();
 });
     
-    
+//function rescheduleTest() {
+//    // for gesture recognition:
+//    console.log(".");
+//    setTimeout(rescheduleTest, 100);
+//}
+
+
  
     //if(0) {console.log("0+  " + getTimeNow() + "ms");}
 

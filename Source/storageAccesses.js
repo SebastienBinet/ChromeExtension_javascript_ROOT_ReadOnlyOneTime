@@ -5,8 +5,8 @@
 /*jslint devel: true */
 /*jslint browser: true*/
 
-var debLogA = 1;
-var debLogB = 1;
+var debLogA = 0;
+var debLogB = 0;
 
 function getTimeNow() {
     "use strict";
@@ -22,7 +22,7 @@ var currentRootConfig = null;
 function retrieve_ROOT_options() {
     "use strict";
     chrome.storage.sync.get({
-        RootColor: 'yellow',
+        RootColor: 'Lavender',
         RootNbWordMatch: '4',
         RootGreyMode: 'Font Solid Color',
         RootSelectionMode: 'Top is invisible and bottom is very high in screen',

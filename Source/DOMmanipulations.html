@@ -70,23 +70,23 @@ function greyAllElements() {
 //    $("body *").not("script").css("background-color", "yellow");
 }
     
-// Parse the array of elements and anlayze the text in it
+// Parse the array of elements and analyze the text in it
 function analyseArrayOfAllElements(arrayOfSimpleElements) {
     for (i = 0; i< arrayOfSimpleElements.length; i++) {
         arrayOfAnalysedElements[i].node = arrayOfSimpleElements[i];
         arrayOfAnalysedElements[i].characters = 
-        arrayOfSimpleElements[i]
-        .clone()    //clone the element
- //       .not("script")
-        .children() //select all the children
-        .remove()   //remove all the children
-        .end()  //again go back to selected element
-        .text();
+            arrayOfSimpleElements[i]
+                .clone()    //clone the element
+                //       .not("script")
+                .children() //select all the children
+                .remove()   //remove all the children
+                .end()  //again go back to selected element
+                .text();
         
-//        arrayOfAnalysedElements[i].node.
-//        if (arrayOfSimpleElements[i].css("color") == ROOT_COLOR) {
-//            
-//        }
+        //        arrayOfAnalysedElements[i].node.
+        //        if (arrayOfSimpleElements[i].css("color") == ROOT_COLOR) {
+        //            
+        //        }
     }
 }
     
