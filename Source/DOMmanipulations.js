@@ -91,21 +91,42 @@ function setElementWithThisStyle(el, mode, color) {
     "use strict";
    
     if (el !== null &&  mode !== null && color !== null) {
-
-        if (mode.indexOf("Background Single Solid Color") >= 0) {
-            // save previous background color
+        // save initial background color if not yet saved
+        var initialBackgroundColorAttr = el.getAttributeNode("data-root-style-background-color");
+        if (initialBackgroundColorAttr !== null) {
+            var initialBackgroundColor     = initialBackgroundColorAttr.value;
+        }
+        var initialFontColorAttr       = el.getAttributeNode("data-root-style-font-color");
+        if (initialFontColorAttr !== null) {
+            var initialFontColor           = initialFontColorAttr.value;
+        }
+        
+        if (initialBackgroundColor == null) {
             var backgroundColor = el.style.backgroundColor;
             el.setAttribute("data-root-style-background-color", backgroundColor);
+        }
+        // save previous font color if not yet saved
+        if (initialFontColor == null) {
+            var fontColor = el.style.color;
+            el.setAttribute("data-root-style-font-color", fontColor);
+        }
+        
+        if (mode.indexOf("Background Single Solid Color") >= 0) {
             // set new background color
             el.style.backgroundColor = color;
+            // reset font color
+            if (initialFontColor !== null) {
+                el.style.color = initialFontColor;
+            }
         } else if (mode.indexOf("Overlay Box Alpha With Actual Background Color") >= 0) {
             var dummy = 0;
         } else if (mode.indexOf("Font Solid Color") >= 0) {
-           // save previous font color
-            var fontColor = el.style.color;
-            el.setAttribute("data-root-style-font-color", fontColor);
             // set new background color
             el.style.color = color;
+            // reset background color
+            if (initialBackgroundColor !== null) {
+                el.style.backgroundColor = initialBackgroundColor;
+            }
         }
     }
 //    el.style.borderRadius = "15px";
