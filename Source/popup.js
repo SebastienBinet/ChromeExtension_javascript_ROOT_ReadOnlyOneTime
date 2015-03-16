@@ -37,14 +37,14 @@ function display_options() {
     RootColor: 'Lavender',
     RootNbWordMatch: '4',
     RootGreyMode: 'Font Solid Color',
-    RootSelectionMode: 'Top is invisible and bottom is very high in screen',
-    RootVisualFeedback: 'none'
+    RootSelectionMode: 'Top is invisible and bottom is very high in screen'
+//    RootVisualFeedback: 'none'
   }, function(items) {
     document.getElementById('RootColor').textContent = items.RootColor;
     document.getElementById('RootNbWordMatch').textContent = items.RootNbWordMatch;
     document.getElementById('RootGreyMode').textContent = items.RootGreyMode;
     document.getElementById('RootSelectionMode').textContent = items.RootSelectionMode;
-    document.getElementById('RootVisualFeedback').textContent = items.RootVisualFeedback;
+//    document.getElementById('RootVisualFeedback').textContent = items.RootVisualFeedback;
   });
 }
 

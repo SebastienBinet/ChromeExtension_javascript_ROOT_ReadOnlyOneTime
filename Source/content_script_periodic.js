@@ -316,7 +316,7 @@ function isThisElementConsideredAsInReadZone(el) {
    
     // The check to mark is configurable
     if (ROOTconfig && ROOTconfig.RootSelectionMode) {
-        if (ROOTconfig.RootSelectionMode.indexOf("Every Element Completely At Left And Above The Current Mouse Position In The whole Document") >= 0) {
+        if (ROOTconfig.RootSelectionMode.indexOf("Every Element Completely At Left And Above The Current Mouse Position In The Whole Document") >= 0) {
             isIt = isMostOfThisElementLeftAndAboveCurrentMousePosition(el);
         } else {
             console.log("ERROR 543522, should never get here, because this function is useful only when in this making mode");
@@ -554,7 +554,7 @@ function parseAllPageAndSaveTextInCurrentReadingZone() {
         
     var textToPutInStorage;
     if (ROOTconfig && ROOTconfig.RootSelectionMode) {
-        if (ROOTconfig.RootSelectionMode.indexOf("Every Element Completely At Left And Above The Current Mouse Position In The whole Document") >= 0) {
+        if (ROOTconfig.RootSelectionMode.indexOf("Every Element Completely At Left And Above The Current Mouse Position In The Whole Document") >= 0) {
             var firstUsefulElement = $("body *").not("script")[0];
             // sanity check
             if (firstUsefulElement !== null) {

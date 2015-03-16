@@ -25,8 +25,8 @@ function retrieve_ROOT_options() {
         RootColor: 'Lavender',
         RootNbWordMatch: '4',
         RootGreyMode: 'Font Solid Color',
-        RootSelectionMode: 'Top is invisible and bottom is very high in screen',
-        RootVisualFeedback: 'none'
+        RootSelectionMode: 'Top is invisible and bottom is very high in screen'
+//        RootVisualFeedback: 'none'
     }, function (items) {
         currentRootConfig = items;
         if (debLogB) {console.log("Config color is currently: " + currentRootConfig.RootColor); }
