@@ -730,6 +730,9 @@ var hoverInfo = {
 
 function enter_el(el) {
     "use strict";
+//////////////////////////////////////////////
+if (0) { /////////////////////////////////////
+//////////////////////////////////////////////    
     // first, remove previous element
     if (hoverInfo.elementUnderMouse && (hoverInfo.elementUnderMouse !== null) && (hoverInfo.elementBackgroundColor !== "")) {
         $(hoverInfo.elementUnderMouse).css("border",  hoverInfo.elementBackgroundColor);
@@ -760,10 +763,16 @@ function enter_el(el) {
             
         
     }
-   
+//////////////////////////////////////////////
+} ///////////////////// end if (0)
+//////////////////////////////////////////////
+
 }
 function leave_el(el) {
     "use strict";
+//////////////////////////////////////////////
+if (0) { /////////////////////////////////////
+//////////////////////////////////////////////    
     if (hoverInfo.elementUnderMouse !== null) {
 //        var oneColor = "rgb(" + Math.floor(Math.random()*256) + "," + Math.floor(Math.random()*256) + "," + Math.floor(Math.random()*256) + ")";
 //        $(el).css({"border": oneColor});
@@ -774,6 +783,9 @@ function leave_el(el) {
     if (el !== hoverInfo.elementUnderMouse) {
         if (DEB_periodic) console.log("ERROR tfgt7sudftg");
     }
+//////////////////////////////////////////////
+} ///////////////////// end if (0)
+//////////////////////////////////////////////
    
 }
 
