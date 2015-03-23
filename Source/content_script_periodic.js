@@ -79,6 +79,9 @@ var previousCurrWinPosY = -1;
 // for visible feedback
 var DoAllTheseBlinks = 0;
 
+// flag to save processing power
+var isTabVisible = true;
+
 
 function getTimeNow() {
     "use strict";
@@ -607,15 +610,40 @@ function autoReschedulingPeriodicGreying() {
     currWinPosY = window.pageYOffset;
     
     
+    
+    checkIfTabIsVisible();
+    if (isTabVisible) {
+        parseAllPageAndSaveTextInCurrentReadingZone();
+        parseAllPageAndGrey();
+        checkIfUndoRequested_type1();
+        checkIfUndoRequested_type2();          
+    }
+    else
+    {
+        if (DEB_periodic) console.log("1+  " + getTimeNow() + "ms");
+    }
+           
+    
 
 
 //    parseAllPAgeAndDisplayReadZone();
-    parseAllPageAndSaveTextInCurrentReadingZone();
-    parseAllPageAndGrey();
-    checkIfUndoRequested_type1();
-    checkIfUndoRequested_type2();  
     if (DEB_periodic) console.log("  3 " + getTimeNow() + "ms");
     setTimeout(autoReschedulingPeriodicGreying, ROOT_PERIOD_MS);
+}
+
+function checkIfTabIsVisible() {
+    isTabVisible = false;
+    if (typeof document.hidden !== "undefined") {
+        if (document.hidden == false) {
+//            console.log("visible");
+            isTabVisible = true;
+        } else {
+        console.log("this tab is hidden");
+        }
+
+    } else {
+        console.log("this tab is hidden (because document.hidden is undefined)");
+    }
 }
 
 function HundredMsTick() {
@@ -872,7 +900,7 @@ $(document).ready(function () {
     setInterval(HundredMsTick, 100);
 //    rescheduleTest();
 });
-    
+
 //function rescheduleTest() {
 //    // for gesture recognition:
 //    console.log(".");
