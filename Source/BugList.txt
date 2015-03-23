@@ -3,13 +3,13 @@ BUG LIST
 -done 1008 - lag
 dans v. 1.1.12, quand il y a plusieurs pages d'ouvertes, il y a du hang et du lag quand on scoll une page. 
 
--1007 - déplace le texte lorsque la souris passe dessus
+-done 1007 - déplace le texte lorsque la souris passe dessus
 http://sat.qc.ca/fr/recherche/recherche-developpement-projets
 cliquer sur le projet Domeport et 
 -placer la souris sur les titres de section (INNOVATION), lorsque la souris d'en ira, les pararaphes se dplaceront vers le haut
 -promener la souris sur les nom dans la liste de développeurs, lorsque la souris s'en ira, l'élément se déplacera vers la gauche.
 
-1006 - pas en gris:
+-1006 - pas en gris:
 http://recherche.lapresse.ca/cyberpresse/search/theme/lapresse?q=bixi&or%5B%5D=chiffres+frais&rangeRel=-1y&sort=recent
 
 
