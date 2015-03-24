@@ -654,7 +654,7 @@ var ttttt=0;
 function PeriodicGestureMouseProcessing() {
     // for gesture recognition:
 //    addThisMouseCoordinate(currX);
-    addThisMouseCoordinates(currX, currY);
+    addThisMouseCoordinates(currX, currY, false);
     if (++ttttt == 100) {
         console.log("||" + getTimeNow() + "ms");
         ttttt = 0;

@@ -30,6 +30,7 @@ var MIN_RADIUS_FOR_CIRCLE_DETECTION = 25;
 
 var REVERSE_THRESHOLD = 100; // to detect that we reversed the mouse direction, we need to travel at least 100 pixels in the new direction.
 var last20Captures = [];
+var currentlyTracingALongEnoughCircleGesture = false;
 //last20Captures.prototype.toString() {}
 
 var validateDetectionXonly; // function forward declaration
@@ -42,9 +43,9 @@ var getMouseGestureStatus; // function  forward declaration
 
 if (SelfTestActivated) {
 var initial_nb_of_ech = NB_OF_ECHANTILLONS_TO_KEEP;
-NB_OF_ECHANTILLONS_TO_KEEP = 20;
 validateDetectionXonly(
     "543hjk345",
+    20, // number of echantillons
     [
         // "(" - cursor, 
         //       "2" - how many reverses in last 20 captures, 
@@ -128,11 +129,13 @@ validateDetectionXonly(
     ]
 );
 
-function validateDetectionXonly(id, testVector) {
+function validateDetectionXonly(id, nbEchantillons, testVector) {
     "use strict";
     var i;
     var errorWasDetected = false;
     if (DEB) document.writeln("<br> starting test with id: " + id + "<br> ");
+
+    NB_OF_ECHANTILLONS_TO_KEEP = nbEchantillons;
 
     for (i = 0; i < testVector.length; i++) {
         addThisMouseCoordinate(testVector[i].x);
@@ -156,11 +159,16 @@ function validateDetectionXonly(id, testVector) {
     }
     if (DEB) document.writeln("<br> finishing test with  id: " + id + "<br> ");
 
+    // After the validation, flush the last20Captures array
+    last20Captures.length = 0;
+    //restore the value;
+    NB_OF_ECHANTILLONS_TO_KEEP = initial_nb_of_ech;
 }
 
 // smallest circle, center not moving   
 validateDetectionXandY(
     "543hj34jh35",
+    20, // number of echantillons
     [
         {x: 2000, y: 2000, enoughCirclesDetected: false},
         {x: 2000, y: 2000, enoughCirclesDetected: false},
@@ -191,7 +199,8 @@ validateDetectionXandY(
         {x: 2000, y: 2050, enoughCirclesDetected: false},
         {x: 1975, y: 2025, enoughCirclesDetected: false},
         {x: 2000, y: 2000, enoughCirclesDetected: true},
-        
+        {x: 2000, y: 2000, enoughCirclesDetected: true},
+        {x: 2000, y: 2000, enoughCirclesDetected: true},
         {x: 2000, y: 2000, enoughCirclesDetected: true},
         {x: 2000, y: 2000, enoughCirclesDetected: true},
         {x: 2000, y: 2000, enoughCirclesDetected: true},
@@ -203,6 +212,7 @@ validateDetectionXandY(
 // smallest circle, center moving to the right
 validateDetectionXandY(
     "543hj34jh36",
+    20, // number of echantillons
     [
         {x: 2000, y: 2000, enoughCirclesDetected: false},
         {x: 2000, y: 2000, enoughCirclesDetected: false},
@@ -228,12 +238,13 @@ validateDetectionXandY(
         {x: 2125, y: 2025, enoughCirclesDetected: false},
         {x: 2100, y: 2050, enoughCirclesDetected: false},
         {x: 2075, y: 2025, enoughCirclesDetected: false},
-        {x: 2100, y: 2000, enoughCirclesDetected: false},
+        {x: 2100, y: 2000, enoughCirclesDetected: false, debugBreak:true},
         {x: 2225, y: 2025, enoughCirclesDetected: false},
         {x: 2200, y: 2050, enoughCirclesDetected: false},
         {x: 2175, y: 2025, enoughCirclesDetected: false},
+        {x: 2200, y: 2000, enoughCirclesDetected: true, debugBreak:true},
         {x: 2200, y: 2000, enoughCirclesDetected: true},
-        
+        {x: 2200, y: 2000, enoughCirclesDetected: true},
         {x: 2200, y: 2000, enoughCirclesDetected: true},
         {x: 2200, y: 2000, enoughCirclesDetected: true},
         {x: 2200, y: 2000, enoughCirclesDetected: true},
@@ -242,11 +253,30 @@ validateDetectionXandY(
     ]
 );
     
+function validateDetectionXandY(id, nbEchantillons, testVector) {
+    "use strict";
+    var i;
+    var errorWasDetected = false;
+    if (DEB) document.writeln("<br> starting test with id: " + id + "<br> ");
+
+    NB_OF_ECHANTILLONS_TO_KEEP = nbEchantillons;
+
+    for (i = 0; i < testVector.length; i++) {
+        addThisMouseCoordinates(testVector[i].x, testVector[i].y, testVector[i].debugBreak);
+        var isThereAnEraseGesture = getMouseCircleGestureStatus();
+        if (isThereAnEraseGesture !== testVector[i].enoughCirclesDetected) {
+            document.writeln("<br>ERROR i5465. for element #" + i + ", expected value was:   " + testVector[i].enoughCirclesDetected + ", but received " + isThereAnEraseGesture + " instead.");
+            errorWasDetected = true;
+        }
+    }
+    if (DEB) document.writeln("<br> finishing test with  id: " + id + "<br> ");
+
+    // After the validation, flush the last20Captures array
+    last20Captures.length = 0;
+    //restore the value;
+    NB_OF_ECHANTILLONS_TO_KEEP = initial_nb_of_ech;
+}
     
-// After the validation, flush the last20Captures array
-last20Captures.length = 0;
-//restore the value;
-NB_OF_ECHANTILLONS_TO_KEEP = initial_nb_of_ech;
 
 }
 
@@ -261,21 +291,21 @@ function helper_valueIfNotNullElseMinus1(x) {
     }
 }
 
-function addThisMouseCoordinates(x, y) {
+function addThisMouseCoordinates(x, y, debugBreak) {
     "use strict";
     // handle only when when mouse is inside the window
     if ((x >= 0) && (x >= 0)) {
         // add coordinates to buffer
-        addCoordinatesToBuffer(x, y);
+        addCoordinatesToBuffer(x, y, debugBreak);
         // compute how many clockwise circles in buffer
         findIfThereWereRecentlyEnoughClockwiseTurns();
      } else {
-        // When mouse is ouside the window, remove oldest coordinate
-        last20Captures.shift();
+        // When mouse is ouside the window, empty buffer
+        last20Captures.length = 0;
     }
 }
 
-function addCoordinatesToBuffer(x, y) {
+function addCoordinatesToBuffer(x, y, debugBreak) {
     // handle when buffer is already full
     if (DEB) console.log(">>>>>add>> x:" + x + "y:" + y);
     var currentLength = last20Captures.length;
@@ -283,28 +313,49 @@ function addCoordinatesToBuffer(x, y) {
         // drop oldest value
         last20Captures.shift();
     }
-    last20Captures.push({x: x, y: y});
+    last20Captures.push({x: x, y: y, debugBreak:debugBreak});
 }
 
 function findIfThereWereRecentlyEnoughClockwiseTurns() {
-    var thereWereEnoughTurns = false;
+//    var thereWereEnoughTurns = false;
     var newLength = last20Captures.length;
     var maxFound = 0;
     // use every coordinate as a starting point to find enough turns
     for (var i = 0; i < newLength; i++) {
         var xiyi = {xi:last20Captures[i].x, yi:last20Captures[i].y};
         // try from each corner of the circle
-        for (var startCondition = 0; startCondition < 4; startCondition ++) {
-            // compute the estimated circle center if this starting coordinate is the top of the circle
-            var xcyc = computeCenterIfStartingWithCondition(xiyi, startCondition);
+        for (var startCondition = 0; startCondition < 1; startCondition ++) {
+            // compute the estimated circle center for this starting condition (condition 0 means we start from the top of the circle)
+            var xcyc = computeCenterIfStartingWithCondition(startCondition, xiyi);
             var conditionReached = 0;
-            // scan the remaining coordinates to find if they form 2 complete circles around the estimated circle center
+            // scan the remaining coordinates to find if they form 2 complete circles with the minimum radius
             for (var j = i; j < newLength; j++) {
-                // check if this coordinate fullfil the requirement for the next turn step
                 var xjyj = {xj:last20Captures[j].x, yj:last20Captures[j].y};
-                if (checkIfCoordinateAdvanceStep(xcyc, xjyj, startCondition + conditionReached)) {
+                // for this condition, compute sign-corrected delta primary direction ans sign-corrected delta secondary direction
+                var signCorrectedDeltas = computeSignCorrectedDeltas(startCondition + conditionReached, xcyc, xjyj);
+                
+                // In secondary direction, check if going further backward
+                if (signCorrectedDeltas.inSecondaryDirection < -MIN_RADIUS_FOR_CIRCLE_DETECTION) {
+                    // we can take advantage of this -> Change the center
+                    xcyc = setNewCenterInSecondaryDirection(startCondition + conditionReached, xcyc, xjyj);
+                }
+                
+                // In primary direction, check if going further backward
+                if (signCorrectedDeltas.inPrimaryDirection < -MIN_RADIUS_FOR_CIRCLE_DETECTION) {
+                    // we can take advantage of this -> Change the center
+                    xcyc = setNewCenterInPrimaryDirection(startCondition + conditionReached, xcyc, xjyj);
+                }
+                
+                // In primary direction, check if going enough forward to detect that the condition is reached
+                if (signCorrectedDeltas.inPrimaryDirection >= MIN_RADIUS_FOR_CIRCLE_DETECTION) {
+                    // we modify the center in the primary direction
+                    xcyc = setNewCenterInPrimaryDirection(startCondition + conditionReached, xcyc, xjyj);
+                    // we increment the count of conditions reached
                     conditionReached++;
                 }
+//                if (checkIfCoordinateAdvanceStep(xcyc, xjyj, startCondition + conditionReached)) {
+//                    conditionReached++;
+//                }
             }
             
             if (conditionReached > maxFound) {
@@ -314,15 +365,34 @@ function findIfThereWereRecentlyEnoughClockwiseTurns() {
     }
     console.log("max steps found:" + maxFound);
     
+    currentlyTracingALongEnoughCircleGesture = false;
     // check if 8 quarter turns were found
     if (maxFound >= 8) {
-        thereWereEnoughTurns = true;
+//        thereWereEnoughTurns = true;
+//    }
+        // check if still currently tracing the gesture (for last 8 samples)
+        var sampleStartIndex = newLength - 8;
+        var sampleEndIndex = newLength;
+        var lastSample = last20Captures[newLength - 1];
+        var moveFoundInLastSamples = false;
+        for (var sampleIndex = sampleStartIndex; sampleIndex < sampleEndIndex ; sampleIndex++) {
+            moveFoundInLastSamples = moveFoundInLastSamples || (
+                (last20Captures[sampleIndex].x > (lastSample.x + 2)) ||
+                (last20Captures[sampleIndex].x < (lastSample.x - 2)) ||
+                (last20Captures[sampleIndex].y > (lastSample.y + 2)) ||
+                (last20Captures[sampleIndex].y < (lastSample.y - 2))
+            );
+        }
+        
+        if (moveFoundInLastSamples) {
+            currentlyTracingALongEnoughCircleGesture = true;
+        }
+
     }
-    return thereWereEnoughTurns;
 }
 
 // conditionIndex of 0 means that xiyi is the top of the circle
-function computeCenterIfStartingWithCondition(xiyi, conditionIndex) {
+function computeCenterIfStartingWithCondition(conditionIndex, xiyi) {
     var retXcYc;
     switch (conditionIndex % 4) {
         case 0:
@@ -344,27 +414,110 @@ function computeCenterIfStartingWithCondition(xiyi, conditionIndex) {
     return retXcYc;
 }
 
-function checkIfCoordinateAdvanceStep(xcyc, xjyj, conditionIndex) {
-    var conditionWasMet = false;
+function setNewCenterInPrimaryDirection(conditionIndex, previous_xcyc, xjyj) {
+    var retXcYc;
     switch (conditionIndex % 4) {
-        case 0:
-            conditionWasMet = (xjyj.xj >= (xcyc.xc + MIN_RADIUS_FOR_CIRCLE_DETECTION));
+        case 0: // prim=right, sec=down
+            retXcYc = {xc:(xjyj.xj - MIN_RADIUS_FOR_CIRCLE_DETECTION), yc:(previous_xcyc.yc)                         };
             break;
-        case 1:
-            conditionWasMet = (xjyj.yj >= (xcyc.yc + MIN_RADIUS_FOR_CIRCLE_DETECTION));
+        case 1: // prim=down, sec=left
+            retXcYc = {xc:(previous_xcyc.xc)                         , yc:(xjyj.yj - MIN_RADIUS_FOR_CIRCLE_DETECTION)};
             break;
         case 2:
-            conditionWasMet = (xjyj.xj <= (xcyc.xc - MIN_RADIUS_FOR_CIRCLE_DETECTION));
+            retXcYc = {xc:(xjyj.xj + MIN_RADIUS_FOR_CIRCLE_DETECTION), yc:(previous_xcyc.yc)                         };
             break;
         case 3:
-            conditionWasMet = (xjyj.yj <= (xcyc.yc - MIN_RADIUS_FOR_CIRCLE_DETECTION));
+            retXcYc = {xc:(previous_xcyc.xc)                         , yc:(xjyj.yj + MIN_RADIUS_FOR_CIRCLE_DETECTION)};
+            break;
+        default:
+            console.log ("ERROR jj654j34j5j354jl");
+            break;
+    }
+    return retXcYc;    
+}
+function setNewCenterInSecondaryDirection(conditionIndex, previous_xcyc, xjyj) {
+    var retXcYc;
+    switch (conditionIndex % 4) {
+        case 0: // prim=right, sec=down
+            retXcYc = {xc:(previous_xcyc.xc)                        , yc:(xjyj.yj + MIN_RADIUS_FOR_CIRCLE_DETECTION)};
+            break;
+        case 1: // prim=down, sec=left
+            retXcYc = {xc:(xjyj.xj - MIN_RADIUS_FOR_CIRCLE_DETECTION), yc:(previous_xcyc.yc)                        };
+            break;
+        case 2:
+            retXcYc = {xc:(previous_xcyc.xc)                         , yc:(xjyj.yj - MIN_RADIUS_FOR_CIRCLE_DETECTION)};
+            break;
+        case 3:
+            retXcYc = {xc:(xjyj.xj + MIN_RADIUS_FOR_CIRCLE_DETECTION), yc:(previous_xcyc.yc)                         };
+            break;
+        default:
+            console.log ("ERROR jj654j34j5j354jm");
+            break;
+    }
+    return retXcYc;    
+}
+
+function computeSignCorrectedDeltas(conditionIndex, xcyc, xjyj) {
+    var retSignCorrectedDeltas = {inPrimaryDirection : 0, inSecondaryDirection : 0};
+    var nonCorectedDeltaX = xjyj.xj - xcyc.xc;
+    var nonCorectedDeltaY = xjyj.yj - xcyc.yc;
+    switch (conditionIndex % 4) {
+        case 0: // going to right: delta primary is positive if going to right. delta secondary is positive if going down 
+            retSignCorrectedDeltas.inPrimaryDirection   =  nonCorectedDeltaX;
+            retSignCorrectedDeltas.inSecondaryDirection =  nonCorectedDeltaY;
+            break;
+        case 1: // going down: delta primary is positive if going down. delta secondary is positive if going to left
+            retSignCorrectedDeltas.inPrimaryDirection   =  nonCorectedDeltaY;
+            retSignCorrectedDeltas.inSecondaryDirection = -nonCorectedDeltaX;
+            break;
+        case 2: // going to left: delta primary is positive if going to left. delta secondary is positive if going up
+            retSignCorrectedDeltas.inPrimaryDirection   = -nonCorectedDeltaX;
+            retSignCorrectedDeltas.inSecondaryDirection = -nonCorectedDeltaY;
+            break;
+        case 3: // going up: delta primary is positive if going up. delta secondary is positive if going to right
+            retSignCorrectedDeltas.inPrimaryDirection   = -nonCorectedDeltaY;
+            retSignCorrectedDeltas.inSecondaryDirection =  nonCorectedDeltaX;
             break;
         default:
             console.log ("ERROR 654hjk35jk3h6");
             break;
     }
-    return conditionWasMet;
+    return retSignCorrectedDeltas;
 }
+
+function getMouseCircleGestureStatus() {
+    "use strict";
+    return currentlyTracingALongEnoughCircleGesture;
+}
+
+
+//// check for this condition if the trigger is reached.
+////     for condition 0, it means that we try to detect that we are past below the "center"
+//function checkIfCoordinateAdvanceStep(xcyc, xjyj, conditionIndex) {
+//    var conditionWasMet = false;
+//    switch (conditionIndex % 4) {
+//        case 0:
+//            conditionWasMet = (xjyj.xj >= (xcyc.xc + MIN_RADIUS_FOR_CIRCLE_DETECTION));
+//            break;
+//        case 1:
+//            conditionWasMet = (xjyj.yj >= (xcyc.yc + MIN_RADIUS_FOR_CIRCLE_DETECTION));
+//            break;
+//        case 2:
+//            conditionWasMet = (xjyj.xj <= (xcyc.xc - MIN_RADIUS_FOR_CIRCLE_DETECTION));
+//            break;
+//        case 3:
+//            conditionWasMet = (xjyj.yj <= (xcyc.yc - MIN_RADIUS_FOR_CIRCLE_DETECTION));
+//            break;
+//        default:
+//            console.log ("ERROR 654hjk35jk3h6");
+//            break;
+//    }
+//    return conditionWasMet;
+//}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+////   X only   ////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
 
 function addThisMouseCoordinate(x) {
     "use strict";
