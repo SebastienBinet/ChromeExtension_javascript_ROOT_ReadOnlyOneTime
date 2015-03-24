@@ -102,6 +102,7 @@ function checkIfUndoRequested_type1() {
     }
 }
 
+// swipe
 function checkIfUndoRequested_type2() {
     "use strict";
     //console.log("================================================curr:" + currX + "," + currY + " - and win:" + currWinPosX + "," + currWinPosY);
@@ -136,6 +137,38 @@ function checkIfUndoRequested_type2() {
     }
 }
 
+// circles
+function checkIfUndoRequested_type3() {
+    var isThereAnEraseGesture = getMouseCircleGestureStatus();
+    if (isThereAnEraseGesture) {
+        // remove some text from the end of the storage
+        var currentTextInStorage = getAllTextFromStorage();
+        // temporary: remove 100 chars each time
+        var textToPutInStorage = currentTextInStorage.slice(0, -500);
+        replaceStorage(textToPutInStorage);
+
+        // display some feedback
+        if (DoAllTheseBlinks == 0) {
+            // make it on, then off, then it can be re-armed
+            DoAllTheseBlinks = 2;
+        }
+    }
+    
+    
+    // visual feedback
+    if (DoAllTheseBlinks == 2) {
+        var theBody = $("body")[0];
+        var mode = "Background Single Solid Color";
+        var ROOTconfig = get_ROOT_options();
+        var color = ROOTconfig.RootColor;
+        setElementWithThisStyle(theBody, mode, color);
+        DoAllTheseBlinks--;
+    } else if (DoAllTheseBlinks == 1){
+        var theBody = $("body")[0];
+        resetElementStyle(theBody);
+        DoAllTheseBlinks--;
+    }
+ }
 
 function removeDotDotDots(textIn) {
     "use strict";
@@ -555,21 +588,20 @@ function checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(e
 function parseAllPageAndSaveTextInCurrentReadingZone() {
     "use strict";
         
-    var textToPutInStorage;
+    var textCurentlyInStorage = getAllTextFromStorage();
+    var textToPutBackInStorage= textCurentlyInStorage;
     if (ROOTconfig && ROOTconfig.RootSelectionMode) {
         if (ROOTconfig.RootSelectionMode.indexOf("Every Element Completely At Left And Above The Current Mouse Position In The Whole Document") >= 0) {
             var firstUsefulElement = $("body *").not("script")[0];
             // sanity check
             if (firstUsefulElement !== null) {
                 var ret003;
-                var currentTextInStorage = getAllTextFromStorage();
-                ret003 = checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(firstUsefulElement, currentTextInStorage);
-                textToPutInStorage = ret003.newText;
+                ret003 = checkThisElementAndItsChildren_AndIfItIsAreInCurrentReadZoneAndSaveIt(firstUsefulElement, textCurentlyInStorage);
+                textToPutBackInStorage = ret003.newText;
             }
         } else if (ROOTconfig.RootSelectionMode.indexOf("Top is invisible and bottom is very high in screen") >= 0) {
             var arrayOfSimpleElements = getAllUsefulElements();
             // start with current text in storage, then add after it
-            textToPutInStorage = getAllTextFromStorage();
             if (arrayOfSimpleElements !== null) {
                 var iii;
                 for (iii = 0; iii < arrayOfSimpleElements.length; iii++) {
@@ -585,16 +617,20 @@ function parseAllPageAndSaveTextInCurrentReadingZone() {
                         // remove the dots
                         var inText = el.innerText;
                         inText = removeDotDotDots(inText);
-                        if (textToPutInStorage.indexOf(inText) < 0) {
+                        if (textToPutBackInStorage.indexOf(inText) < 0) {
                             // it is not already in storage
                             // so add this text
-                            textToPutInStorage += inText;
+                            textToPutBackInStorage += inText;
                         }
                     }
                 }
             }
         }
-        replaceStorage(textToPutInStorage);
+        
+        // replace only if different
+        if (textCurentlyInStorage.indexOf(textToPutBackInStorage) != 0 ) {
+            replaceStorage(textToPutBackInStorage);
+        }
     }
 }
 
@@ -615,8 +651,9 @@ function autoReschedulingPeriodicGreying() {
     if (isTabVisible) {
         parseAllPageAndSaveTextInCurrentReadingZone();
         parseAllPageAndGrey();
-        checkIfUndoRequested_type1();
-        checkIfUndoRequested_type2();          
+        //checkIfUndoRequested_type1();
+        //checkIfUndoRequested_type2();          
+        checkIfUndoRequested_type3();          
     }
     else
     {

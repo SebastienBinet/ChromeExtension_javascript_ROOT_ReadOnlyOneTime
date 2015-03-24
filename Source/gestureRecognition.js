@@ -11,7 +11,7 @@
 
 var SelfTestActivated = false;
 var DEB = false; // is "DEB"ug log enabled? 
-var NB_OF_ECHANTILLONS_TO_KEEP = 200; // at a little more than 10ms each, about 2 sec
+var NB_OF_ECHANTILLONS_TO_KEEP = 75; // at a little more than 10ms (+lag) each,
 var MIN_RADIUS_FOR_CIRCLE_DETECTION = 25;
 
 //in progress - function oneCapture() {
@@ -342,11 +342,13 @@ function helper_valueIfNotNullElseMinus1(x) {
 
 function addThisMouseCoordinates(x, y, debugBreak) {
     "use strict";
-    console.log("x=" + x + ", y=" + y);
+    if (DEB) console.log("x=" + x + ", y=" + y);
     // handle only when when mouse is inside the window
     if ((x >= 0) && (x >= 0)) {
         // add coordinates to buffer
         addCoordinatesToBuffer(x, y, debugBreak);
+        // flush buffer if not moving anymore
+        flushBufferIfNotMoving();
         // compute how many clockwise circles in buffer
         findIfThereWereRecentlyEnoughClockwiseTurns();
      } else {
@@ -364,6 +366,31 @@ function addCoordinatesToBuffer(x, y, debugBreak) {
         last20Captures.shift();
     }
     last20Captures.push({x: x, y: y, debugBreak:debugBreak});
+}
+
+function flushBufferIfNotMoving() {
+    var currentLength = last20Captures.length;
+    var NUMBER_OF_SAMPLE_IN_WHICH_TO_LOOK_FOR_MOVE = 8
+    // check if currently moving
+    if (currentLength >= NUMBER_OF_SAMPLE_IN_WHICH_TO_LOOK_FOR_MOVE) {
+        var sampleStartIndex = currentLength - NUMBER_OF_SAMPLE_IN_WHICH_TO_LOOK_FOR_MOVE;
+        var sampleEndIndex = currentLength - 1;
+        var lastSample = last20Captures[sampleEndIndex];
+        var moveFoundInLastSamples = false;
+        for (var sampleIndex = sampleStartIndex; sampleIndex < sampleEndIndex ; sampleIndex++) {
+            moveFoundInLastSamples = moveFoundInLastSamples || (
+                (last20Captures[sampleIndex].x > (lastSample.x + 2)) ||
+                (last20Captures[sampleIndex].x < (lastSample.x - 2)) ||
+                (last20Captures[sampleIndex].y > (lastSample.y + 2)) ||
+                (last20Captures[sampleIndex].y < (lastSample.y - 2))
+            );
+        }
+
+        if (!moveFoundInLastSamples) {
+            // flush buffer because no recent move
+            last20Captures.length = 0;
+        }
+    }
 }
 
 function findIfThereWereRecentlyEnoughClockwiseTurns() {
@@ -401,7 +428,9 @@ function findIfThereWereRecentlyEnoughClockwiseTurns() {
                 }
                 
                 // In primary direction, check if going enough forward to detect that the condition is reached
-                if (signCorrectedDeltas.inPrimaryDirection >= MIN_RADIUS_FOR_CIRCLE_DETECTION) {
+                if ((signCorrectedDeltas.inPrimaryDirection >= MIN_RADIUS_FOR_CIRCLE_DETECTION) &&
+                    // and that we are still in the proper quadrant
+                    (signCorrectedDeltas.inSecondaryDirection <= 0)) {
                     // we modify the center in the primary direction
                     xcyc = setNewCenterInPrimaryDirection(startCondition + conditionReached, xcyc, xjyj);
                     // we increment the count of conditions reached
@@ -422,30 +451,30 @@ function findIfThereWereRecentlyEnoughClockwiseTurns() {
             }
         }
     }
-    console.log("max steps found:" + maxFound);
+    if (DEB) console.log("max steps found:" + maxFound);
     
     currentlyTracingALongEnoughCircleGesture = false;
     // check if 8 quarter turns were found
     if (maxFound >= 8) {
-//        thereWereEnoughTurns = true;
-//    }
-        // check if still currently tracing the gesture (for last 8 samples)
-        var sampleStartIndex = newLength - 8;
-        var sampleEndIndex = newLength;
-        var lastSample = last20Captures[newLength - 1];
-        var moveFoundInLastSamples = false;
-        for (var sampleIndex = sampleStartIndex; sampleIndex < sampleEndIndex ; sampleIndex++) {
-            moveFoundInLastSamples = moveFoundInLastSamples || (
-                (last20Captures[sampleIndex].x > (lastSample.x + 2)) ||
-                (last20Captures[sampleIndex].x < (lastSample.x - 2)) ||
-                (last20Captures[sampleIndex].y > (lastSample.y + 2)) ||
-                (last20Captures[sampleIndex].y < (lastSample.y - 2))
-            );
-        }
-        
-        if (moveFoundInLastSamples) {
+////        thereWereEnoughTurns = true;
+////    }
+//        // check if still currently tracing the gesture (for last 8 samples)
+//        var sampleStartIndex = newLength - 8;
+//        var sampleEndIndex = newLength;
+//        var lastSample = last20Captures[newLength - 1];
+//        var moveFoundInLastSamples = false;
+//        for (var sampleIndex = sampleStartIndex; sampleIndex < sampleEndIndex ; sampleIndex++) {
+//            moveFoundInLastSamples = moveFoundInLastSamples || (
+//                (last20Captures[sampleIndex].x > (lastSample.x + 2)) ||
+//                (last20Captures[sampleIndex].x < (lastSample.x - 2)) ||
+//                (last20Captures[sampleIndex].y > (lastSample.y + 2)) ||
+//                (last20Captures[sampleIndex].y < (lastSample.y - 2))
+//            );
+//        }
+//        
+//        if (moveFoundInLastSamples) {
             currentlyTracingALongEnoughCircleGesture = true;
-        }
+//        }
 
     }
 }
