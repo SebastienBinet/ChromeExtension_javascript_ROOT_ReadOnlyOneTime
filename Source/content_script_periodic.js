@@ -646,14 +646,15 @@ function checkIfTabIsVisible() {
     }
 }
 
-function HundredMsTick() {
+function tenMsTick() {
     PeriodicGestureMouseProcessing();
 }
 
 var ttttt=0;
 function PeriodicGestureMouseProcessing() {
     // for gesture recognition:
-    addThisMouseCoordinate(currX);
+//    addThisMouseCoordinate(currX);
+    addThisMouseCoordinates(currX, currY);
     if (++ttttt == 100) {
         console.log("||" + getTimeNow() + "ms");
         ttttt = 0;
@@ -909,7 +910,7 @@ $(document).ready(function () {
    //if(0) {console.log("0+++" + getTimeNow() + "ms");}
     autoReschedulingPeriodicGreying();
     //autoReschedulingGestureMouseProcessing();
-    setInterval(HundredMsTick, 100);
+    setInterval(tenMsTick, 10);
 //    rescheduleTest();
 });
 
