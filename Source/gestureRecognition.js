@@ -9,7 +9,7 @@
 
 //var GESTURE_RECOGNITION_PERIOD_MS = 50; // ms
 
-var SelfTestActivated = true;
+var SelfTestActivated = false;
 var DEB = false; // is "DEB"ug log enabled? 
 var NB_OF_ECHANTILLONS_TO_KEEP = 200; // at a little more than 10ms each, about 2 sec
 var MIN_RADIUS_FOR_CIRCLE_DETECTION = 25;
@@ -252,6 +252,55 @@ validateDetectionXandY(
         {x: 2200, y: 2000, enoughCirclesDetected: false}
     ]
 );
+
+    
+    
+// bug check
+validateDetectionXandY(
+    "543hj34jh37",
+    20, // number of echantillons
+    [
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2000, y: 2005, enoughCirclesDetected: false},
+        {x: 2010, y: 2004, enoughCirclesDetected: false},
+        {x: 2020, y: 2006, enoughCirclesDetected: false},
+        {x: 2030, y: 2004, enoughCirclesDetected: false},
+        {x: 2040, y: 2006, enoughCirclesDetected: false},
+        {x: 2050, y: 2004, enoughCirclesDetected: false},
+        {x: 2060, y: 2006, enoughCirclesDetected: false},
+        {x: 2070, y: 2004, enoughCirclesDetected: false},
+        {x: 2080, y: 2006, enoughCirclesDetected: false},
+        {x: 2090, y: 2004, enoughCirclesDetected: false},
+        {x: 2100, y: 2006, enoughCirclesDetected: false},
+        {x: 2110, y: 2004, enoughCirclesDetected: false},
+        {x: 2120, y: 2006, enoughCirclesDetected: false},
+        {x: 2130, y: 2004, enoughCirclesDetected: false}
+    ]
+);
     
 function validateDetectionXandY(id, nbEchantillons, testVector) {
     "use strict";
@@ -293,6 +342,7 @@ function helper_valueIfNotNullElseMinus1(x) {
 
 function addThisMouseCoordinates(x, y, debugBreak) {
     "use strict";
+    console.log("x=" + x + ", y=" + y);
     // handle only when when mouse is inside the window
     if ((x >= 0) && (x >= 0)) {
         // add coordinates to buffer
@@ -324,26 +374,30 @@ function findIfThereWereRecentlyEnoughClockwiseTurns() {
     for (var i = 0; i < newLength; i++) {
         var xiyi = {xi:last20Captures[i].x, yi:last20Captures[i].y};
         // try from each corner of the circle
-        for (var startCondition = 0; startCondition < 1; startCondition ++) {
+        for (var startCondition = 0; startCondition < 4; startCondition ++) {
             // compute the estimated circle center for this starting condition (condition 0 means we start from the top of the circle)
             var xcyc = computeCenterIfStartingWithCondition(startCondition, xiyi);
             var conditionReached = 0;
+            var values=">>>>";
             // scan the remaining coordinates to find if they form 2 complete circles with the minimum radius
             for (var j = i; j < newLength; j++) {
                 var xjyj = {xj:last20Captures[j].x, yj:last20Captures[j].y};
+                values +=  " [[when c:" + conditionReached + ", xc:" + xcyc.xc + ", yc:" + xcyc.yc + ",  xj:" + xjyj.xj + ", yj:" + xjyj.yj;
                 // for this condition, compute sign-corrected delta primary direction ans sign-corrected delta secondary direction
                 var signCorrectedDeltas = computeSignCorrectedDeltas(startCondition + conditionReached, xcyc, xjyj);
                 
                 // In secondary direction, check if going further backward
                 if (signCorrectedDeltas.inSecondaryDirection < -MIN_RADIUS_FOR_CIRCLE_DETECTION) {
                     // we can take advantage of this -> Change the center
-                    xcyc = setNewCenterInSecondaryDirection(startCondition + conditionReached, xcyc, xjyj);
+                    xcyc = setNewCenterInSecondaryDirectionLagging(startCondition + conditionReached, xcyc, xjyj);
+                    values += " then ((sec< )) and <<new xc:>> " + xcyc.xc + ", yc:" + xcyc.yc;
                 }
                 
                 // In primary direction, check if going further backward
                 if (signCorrectedDeltas.inPrimaryDirection < -MIN_RADIUS_FOR_CIRCLE_DETECTION) {
                     // we can take advantage of this -> Change the center
-                    xcyc = setNewCenterInPrimaryDirection(startCondition + conditionReached, xcyc, xjyj);
+                    xcyc = setNewCenterInPrimaryDirectionLagging(startCondition + conditionReached, xcyc, xjyj);
+                    values += " then \\prim< // and <<new xc:>> " + xcyc.xc + ", yc:" + xcyc.yc;
                 }
                 
                 // In primary direction, check if going enough forward to detect that the condition is reached
@@ -352,11 +406,16 @@ function findIfThereWereRecentlyEnoughClockwiseTurns() {
                     xcyc = setNewCenterInPrimaryDirection(startCondition + conditionReached, xcyc, xjyj);
                     // we increment the count of conditions reached
                     conditionReached++;
+                    values += " then ==prim> == and <<new xc:>> " + xcyc.xc + ", yc:" + xcyc.yc + ", QQ new c: QQ"  + conditionReached;
                 }
 //                if (checkIfCoordinateAdvanceStep(xcyc, xjyj, startCondition + conditionReached)) {
 //                    conditionReached++;
 //                }
+//                values += "xj:" + xjyj.xj + ", yj:" + xjyj.yj + ", xc:" + xcyc.xc + ", yc:" + xcyc.yc + ", c:" + conditionReached + "--";
+                values += "]] ";
             }
+            
+            if (DEB) console.log(values);
             
             if (conditionReached > maxFound) {
                 maxFound = conditionReached;
@@ -435,7 +494,28 @@ function setNewCenterInPrimaryDirection(conditionIndex, previous_xcyc, xjyj) {
     }
     return retXcYc;    
 }
-function setNewCenterInSecondaryDirection(conditionIndex, previous_xcyc, xjyj) {
+function setNewCenterInPrimaryDirectionLagging(conditionIndex, previous_xcyc, xjyj) {
+    var retXcYc;
+    switch (conditionIndex % 4) {
+        case 0: // prim=right, sec=down
+            retXcYc = {xc:(xjyj.xj + MIN_RADIUS_FOR_CIRCLE_DETECTION), yc:(previous_xcyc.yc)                         };
+            break;
+        case 1: // prim=down, sec=left
+            retXcYc = {xc:(previous_xcyc.xc)                         , yc:(xjyj.yj + MIN_RADIUS_FOR_CIRCLE_DETECTION)};
+            break;
+        case 2:
+            retXcYc = {xc:(xjyj.xj - MIN_RADIUS_FOR_CIRCLE_DETECTION), yc:(previous_xcyc.yc)                         };
+            break;
+        case 3:
+            retXcYc = {xc:(previous_xcyc.xc)                         , yc:(xjyj.yj - MIN_RADIUS_FOR_CIRCLE_DETECTION)};
+            break;
+        default:
+            console.log ("ERROR jj654j34j5j354jm");
+            break;
+    }
+    return retXcYc;    
+}
+function setNewCenterInSecondaryDirectionLagging(conditionIndex, previous_xcyc, xjyj) {
     var retXcYc;
     switch (conditionIndex % 4) {
         case 0: // prim=right, sec=down
@@ -451,7 +531,7 @@ function setNewCenterInSecondaryDirection(conditionIndex, previous_xcyc, xjyj) {
             retXcYc = {xc:(xjyj.xj + MIN_RADIUS_FOR_CIRCLE_DETECTION), yc:(previous_xcyc.yc)                         };
             break;
         default:
-            console.log ("ERROR jj654j34j5j354jm");
+            console.log ("ERROR jj654j34j5j354jn");
             break;
     }
     return retXcYc;    
