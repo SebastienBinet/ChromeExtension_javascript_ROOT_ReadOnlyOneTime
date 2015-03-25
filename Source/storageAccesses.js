@@ -84,6 +84,10 @@ function replaceStorage(textToStore) {
     "use strict";
 	if (typeof (Storage) !== "undefined") {
         localStorage.setItem("B4D.test001.name", textToStore);
+        var reReadValue = localStorage.getItem("B4D.test001.name");
+        if ((reReadValue.indexOf(textToStore) !=0) || (textToStore.indexOf(reReadValue) !=0)) {
+            console.log("failure occured during writing to local storage");
+        }
         if (debLogA) {console.log("size of locale storage:" + textToStore.length); }
         
     }
