@@ -4,6 +4,7 @@ var DEB_periodic = 0;
 /*global getAllTextFromStorage */
 /*global getAllUsefulElements */
 /*global getPosInfo */
+/*global getHeight */
 /*global getTimeNow */
 /*global isMostOfThisElementLeftAndAboveCurrentMousePosition */
 /*global replaceStorage */
@@ -205,18 +206,18 @@ function isThereEnoughValidTextInThisElement(el) {
     return areBasicSentenceCriteriaMet;
 }
 
-// check that there is text directly in this element.
-function isThereValidTextDirectlyInThisElement(el) {
-    "use strict";
-    var thereIsUsefulTextDirectly = false,
-        iiii;
-    for (iiii = 0; iiii < el.childNodes.length; iiii++) {
-        if ((el.childNodes[iiii].nodeName === "#text") && (el.childNodes[iiii].wholeText.search(/[A-Z]{2,}/i) >= 0)) {
-            thereIsUsefulTextDirectly = true;
-        }
-    }
-    return thereIsUsefulTextDirectly;
-}
+//// check that there is text directly in this element.
+//function isThereValidTextDirectlyInThisElement(el) {
+//    "use strict";
+//    var thereIsUsefulTextDirectly = false,
+//        iiii;
+//    for (iiii = 0; iiii < el.childNodes.length; iiii++) {
+//        if ((el.childNodes[iiii].nodeName === "#text") && (el.childNodes[iiii].wholeText.search(/[A-Z]{2,}/i) >= 0)) {
+//            thereIsUsefulTextDirectly = true;
+//        }
+//    }
+//    return thereIsUsefulTextDirectly;
+//}
 
 
 function parseAllPageAndGrey() {
@@ -268,17 +269,17 @@ function parseAllPageAndGrey() {
                 // if all text inside this node (includes all children tree) was found in storage
                 if (isTreeAllFound) {
                     // check that there is long enough text directly in this element
-                    var thereIsUsefulTextDirectly = isThereValidTextDirectlyInThisElement(element_i);
+                    //var thereIsUsefulTextDirectly = isThereValidTextDirectlyInThisElement(element_i);
                     // last child if there is no child or if there is 0 child
-                    var lastChild = (element_i && (!element_i.children || (element_i.children.length === 0)));
+                    //var lastChild = (element_i && (!element_i.children || (element_i.children.length === 0)));
                     // if found and there are long enough text directly at this level, put it in grey
-                    if (thereIsUsefulTextDirectly || lastChild) {
+                    //if (thereIsUsefulTextDirectly || lastChild) {
                         setElementWithRootStyleUsefulTextDirectly(element_i, ROOTconfig);
 // is this true?                        // we do not need to parse children, so try to go to next sibbling
                         afterThisElement_stopGoingDown = true;
-                    } else {
-                        setElementWithRootStyleUsefulNoTextDirectly(element_i);
-                    }
+                    //} else {
+                    //    setElementWithRootStyleUsefulNoTextDirectly(element_i);
+                    //}
                 }
             }
             
@@ -361,19 +362,25 @@ function isThisElementConsideredAsInReadZone(el) {
     return isIt;
 }
 
+
 function isElementBeingShiftedOut(el) {
     "use strict";
     var isIt = false;
     var pos = getPosInfo(el);
+    var minElBottom = currWinPosY - 150;
+    var maxElBottom = currWinPosY + 100;
+    var minConditionRespected = pos.bottom > minElBottom;
+    var maxConditionRespected = pos.bottom < maxElBottom;
     //if (0) {console.log("element bottom:" + pos.bottom + "window page y offset:" + currWinPosY + "mouse y:" + currY); }
-    var elIsSplitByTopOfWindow = pos.top < currWinPosY + 100 && pos.bottom > currWinPosY;
-    var elBottomIsNearTheTop = pos.bottom < currWinPosY + 300;
+    //var elIsSplitByTopOfWindow = pos.top < currWinPosY + 100 && pos.bottom > currWinPosY;
+    //var elBottomIsNearTheTop = pos.bottom < currWinPosY + 300;
     var userIsScrollingDown = currWinPosY > previousCurrWinPosY;
 //    if (userIsScrollingDown) {
 //        console.log("scolling down");
 //    }
 //    if ((pos.bottom < currWinPosY + 75) && (pos.bottom >= currWinPosY) && userIsScrollingDown) {
-    if (elIsSplitByTopOfWindow && elBottomIsNearTheTop && userIsScrollingDown) {
+    //if (elIsSplitByTopOfWindow && elBottomIsNearTheTop && userIsScrollingDown) {
+    if (minConditionRespected && maxConditionRespected && userIsScrollingDown) {
         isIt = true;
     }
     return isIt;
@@ -606,13 +613,17 @@ function parseAllPageAndSaveTextInCurrentReadingZone() {
                 var iii;
                 for (iii = 0; iii < arrayOfSimpleElements.length; iii++) {
                     var el = arrayOfSimpleElements[iii];
-                    var isThereTextDirectly = isThereValidTextDirectlyInThisElement(el);
+                    //var isThereTextDirectly = isThereValidTextDirectlyInThisElement(el);
                     var areBasicSentenceCriteriaMet = isThereEnoughValidTextInThisElement(el);
                     var isShifted = isElementBeingShiftedOut(el);
+                    var maxElHeightIfNoTextDirectly = 500;
+                    var elHeight = getHeight(el);
+                    var isMaxElHeightIfNoTextDirectlyRespected = ((elHeight != 0 ) && (elHeight < maxElHeightIfNoTextDirectly));
+
                     var isVert = isCursorVerticallyInsideThisElementArea(el);
 
                     // check if we put this el in storage
-                    var isItInZone = (isThereTextDirectly && areBasicSentenceCriteriaMet && isShifted && isVert);
+                    var isItInZone = (/*isThereTextDirectly &&*/ areBasicSentenceCriteriaMet && isShifted && isMaxElHeightIfNoTextDirectlyRespected && isVert);
                     if (isItInZone) {
                         // remove the dots
                         var inText = el.innerText;

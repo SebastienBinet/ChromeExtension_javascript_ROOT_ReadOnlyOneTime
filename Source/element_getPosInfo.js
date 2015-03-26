@@ -11,6 +11,15 @@ function getPosInfo(elem) {
     }
 }
 
+function getHeight(elem) {
+    if (elem.getBoundingClientRect) {
+        var pos = getPosInfo(elem);
+        return (pos.bottom - pos.top);
+    } else {
+        return -1;
+    }
+}
+
 
 
 function getOffsetSum(elem) {
