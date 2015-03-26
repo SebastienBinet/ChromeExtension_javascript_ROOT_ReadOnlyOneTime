@@ -1,5 +1,11 @@
 BUG LIST
 
+-done 1010 - google search, text en gras n'est pas mis en gris
+par exemple google.gom, "test" -> google mettre "test" en gras dans les résultats, et ROOT ne le met pas en gris.
+
+1009 - no grey
+dans http://startup.singularityu.org/, le text ne devient pas gris
+
 -done 1008 - lag
 dans v. 1.1.12, quand il y a plusieurs pages d'ouvertes, il y a du hang et du lag quand on scoll une page. 
 

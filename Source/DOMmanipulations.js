@@ -138,6 +138,23 @@ function setElementWithRootStyleUsefulTextDirectly(el, config) {
     if ((el !== null) && (config !== null)) {
         setElementWithThisStyle(el, config.RootGreyMode, config.RootColor); // old bad:  currentRootGreyModeForReadElements, currentRootColorForReadElements);
 //        el.style.backgroundColor = config.RootColor;
+        // recurs for all children, even if they don't have long enough text
+        setAllChildrenThatHaveTextWithRootStyle(el, config.RootGreyMode, config.RootColor);
+    }
+}
+
+function setAllChildrenThatHaveTextWithRootStyle(el, mode, color) {
+    // check at this level if there is text
+    var isThereText = (el && el.innerText && el.innerText.search(/[A-Z]+/i) >= 0)
+    // if there is text, grey it
+    if (isThereText) {
+        setElementWithThisStyle(el, mode, color);
+    }
+    // parse all children
+    var child = el.children[0];
+    while (child) {
+        setAllChildrenThatHaveTextWithRootStyle(child, mode, color);
+        child = child.nextElementSibling;
     }
 }
 

@@ -275,7 +275,7 @@ function parseAllPageAndGrey() {
                     if (thereIsUsefulTextDirectly || lastChild) {
                         setElementWithRootStyleUsefulTextDirectly(element_i, ROOTconfig);
 // is this true?                        // we do not need to parse children, so try to go to next sibbling
-//                        afterThisElement_stopGoingDown = true;
+                        afterThisElement_stopGoingDown = true;
                     } else {
                         setElementWithRootStyleUsefulNoTextDirectly(element_i);
                     }
