@@ -18,7 +18,7 @@ This project has permited me to loearn a lot on the following aspects:
 	
 	-Few web source editors and tools
 	
-	-Chrome Extension creation (manifest, jason format)
+	-Chrome Extension creation (manifest, json format)
 	
 	-Publication process on Chrome Web Store
 
